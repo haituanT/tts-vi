@@ -184,16 +184,10 @@ Set an absolute local path to a valid Google service account JSON file.
 
 ### One-click Windows setup
 
-For a fresh clone or pull on Windows, double-click `Start DubFlow App.bat`.
-The first run automatically installs the Backend and Frontend Node dependencies
-from their lockfiles, installs the local Python packages listed in
-`Backend/requirements.txt`, and prepares FFmpeg, ffprobe, and yt-dlp in the
-ignored local tool folders. Later runs reuse the installed dependencies and
-start the app normally.
-
-The setup still requires an internet connection and may use winget to install
-Node.js or Python 3.11 when they are not already available. Microsoft App
-Installer/winget must be available for that automatic runtime installation.
+- **Cài đặt thư viện**: Chạy file [Install Dependencies.bat](file:///d:/UngDung_PC/tts-vi/Install%20Dependencies.bat) để tự động cài đặt tất cả Node.js/Python dependencies, FFmpeg, ffprobe, yt-dlp.
+- **Chạy ứng dụng**: Chạy file [Start DubFlow App.bat](file:///d:/UngDung_PC/tts-vi/Start%20DubFlow%20App.bat). File này sẽ tự động kiểm tra xem các thư viện đã cài đặt đầy đủ chưa:
+  - Nếu chưa cài đặt, file sẽ tự động gọi `Install Dependencies.bat` trước.
+  - Nếu đã cài đặt rồi, file sẽ trực tiếp khởi chạy ứng dụng DubFlow.
 
 ### Backend
 
