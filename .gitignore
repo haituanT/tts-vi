@@ -1,7 +1,7 @@
 # DubFlow gitignore
 #
 # Commit these:
-# - README.md, PIPELINE.md, LICENSE, Start DubFlow App.bat
+# - README.md, PIPELINE.md, LICENSE, Start DubFlow App.bat, Install Dependencies.bat
 # - Backend/ and Frontend/ source code, tests, config files
 # - package.json, package-lock.json, Backend/requirements.txt
 # - Backend/.env.example and real documentation images under images/
@@ -172,8 +172,15 @@ images/Screenshot*.png
 .DS_Store
 Thumbs.db
 Desktop.ini
+.vscode/
 .vscode-test/
+.idea/
+.vs/
+.history/
 .node_repl_history
+*.bak
+*.swp
+*.swo
 
 # Framework/build caches not currently used but safe to ignore
 .grunt/

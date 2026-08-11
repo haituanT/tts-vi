@@ -1,6 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --bg-dark: #07090e;
+  --bg-surface: #0f1422;
+  --bg-card: rgba(17, 24, 39, 0.7);
+  --bg-card-hover: rgba(31, 41, 55, 0.85);
+  
+  --border-glass: rgba(255, 255, 255, 0.09);
+  --border-glass-bright: rgba(255, 255, 255, 0.18);
+  
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --cyan-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  --emerald-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+}
 
 * {
   box-sizing: border-box;
@@ -13,15 +42,19 @@ body {
   max-width: 100vw;
   min-height: 100%;
   overflow-x: hidden;
-  background: #090b12;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  color: #ffffff;
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
   background:
-    radial-gradient(circle at top, rgba(121, 28, 44, 0.28), transparent 36%),
-    linear-gradient(180deg, #0b0d14 0%, #080a11 100%);
+    radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12), transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(168, 85, 247, 0.1), transparent 45%),
+    linear-gradient(180deg, #07090e 0%, #0c101a 100%);
+  background-attachment: fixed;
 }
 
 a {
@@ -29,46 +62,100 @@ a {
   text-decoration: none;
 }
 
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.32);
+  background: rgba(148, 163, 184, 0.45);
+}
+
+/* Base Form Elements */
+font-mono,
+.font-mono {
+  font-family: var(--font-mono) !important;
 }
 
 select option {
-  background: #10131c;
-  color: white;
-  padding: 8px;
+  background-color: #0f172a;
+  color: #f8fafc;
+  padding: 10px;
 }
 
 button,
 input,
 textarea,
 select {
-  font: inherit;
+  font-family: inherit;
+}
+
+/* Glassmorphism Utility Classes */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-glass);
+  border-radius: 12px;
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.glass-input {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+/* Custom Range Inputs */
+input[type="range"] {
+  accent-color: #6366f1;
 }
 
 audio::-webkit-media-controls-panel,
 video::-webkit-media-controls-panel {
-  background-color: rgba(16, 19, 28, 0.92);
+  background-color: rgba(15, 23, 42, 0.92);
+  border-radius: 8px;
 }
 
+/* Header & Shell Styling */
 .app-mode-shell {
   min-height: 100vh;
-  background: #080a11;
+  background: transparent;
 }
 
 .app-mode-topbar {
@@ -76,54 +163,71 @@ video::-webkit-media-controls-panel {
   top: 0;
   z-index: 80;
   display: flex;
-  min-height: 58px;
+  min-height: 62px;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  border-bottom: 1px solid rgba(241, 204, 0, 0.22);
-  background: rgba(8, 10, 17, 0.94);
-  padding: 8px 18px;
-  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(7, 9, 14, 0.82);
+  padding: 10px 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .app-mode-brand {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .app-mode-mark {
   display: inline-grid;
-  height: 34px;
-  width: 34px;
+  height: 38px;
+  width: 38px;
   place-items: center;
-  border: 1px solid rgba(241, 204, 0, 0.45);
-  border-radius: 7px;
-  background: #f1cc00;
-  color: #090b12;
-  font-size: 13px;
-  font-weight: 950;
+  border-radius: 10px;
+  background: var(--accent-gradient);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  letter-spacing: -0.5px;
 }
 
 .app-mode-brand strong {
   display: block;
-  color: #fff7cb;
-  font-size: 14px;
-  font-weight: 900;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 1.1;
+  letter-spacing: -0.2px;
 }
 
 .app-mode-brand small {
   display: block;
-  color: #93a4bb;
+  color: var(--text-muted);
   font-size: 11px;
+  font-weight: 500;
   line-height: 1.25;
+  margin-top: 1px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @media (max-width: 720px) {
   .app-mode-topbar {
     align-items: stretch;
     flex-direction: column;
+    padding: 12px 16px;
   }
 }

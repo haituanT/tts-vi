@@ -12,18 +12,18 @@ const REPORTS = [
 ];
 
 const FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'source', label: 'Source' },
-  { key: 'translation', label: 'Translation' },
-  { key: 'readability', label: 'Readability' },
-  { key: 'tts', label: 'TTS' },
-  { key: 'sync', label: 'Sync' },
+  { key: 'all', label: 'Tất cả' },
+  { key: 'source', label: 'Nguồn' },
+  { key: 'translation', label: 'Dịch thuật' },
+  { key: 'readability', label: 'Độ đọc' },
+  { key: 'tts', label: 'Giọng đọc TTS' },
+  { key: 'sync', label: 'Đồng bộ' },
 ];
 
 function issueTone(status) {
-  if (status === 'error') return 'border-red-500/40 bg-red-500/10 text-red-100';
-  if (status === 'warning') return 'border-amber-500/40 bg-amber-500/10 text-amber-100';
-  return 'border-emerald-500/35 bg-emerald-500/10 text-emerald-100';
+  if (status === 'error') return 'border-rose-500/30 bg-rose-500/10 text-rose-200';
+  if (status === 'warning') return 'border-amber-500/30 bg-amber-500/10 text-amber-200';
+  return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200';
 }
 
 function reportLabel(key) {
@@ -99,9 +99,9 @@ export default function QcReportPanel({
   if (!reports.length && !fitSummary && !summary && !loading) return null;
 
   return (
-    <div className="grid w-full gap-2">
+    <div className="grid w-full gap-2.5">
       {fitSummary ? (
-        <span className="rounded border border-amber-500/40 px-2 py-1 text-amber-100">
+        <span className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-200 backdrop-blur-md">
           TTS fit: {fitSummary.speed_up || 0} speed up - {fitSummary.rewrite || 0} rewrite - {fitSummary.manual_review || 0} review
         </span>
       ) : null}
@@ -109,7 +109,7 @@ export default function QcReportPanel({
         {reports.map((report) => (
           <a
             key={report.key}
-            className="rounded border border-amber-500/40 px-2 py-1 text-amber-200 hover:bg-amber-500/10"
+            className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1 text-xs font-semibold text-indigo-300 transition-colors hover:bg-indigo-500/20"
             href={`${apiBase}${outputs[report.key]}`}
             download
           >
@@ -118,25 +118,25 @@ export default function QcReportPanel({
         ))}
       </div>
 
-      <div className="rounded-[6px] border border-[#263a5d] bg-[#071020] p-2">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-black">
-            <span className={`rounded px-2 py-1 ${summary?.status === 'error' ? 'bg-red-500 text-white' : summary?.status === 'warn' ? 'bg-amber-400 text-black' : 'bg-emerald-500 text-white'}`}>
+      <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3 backdrop-blur-md">
+        <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold">
+            <span className={`rounded-md px-2.5 py-0.5 text-xs ${summary?.status === 'error' ? 'bg-rose-500 text-white' : summary?.status === 'warn' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-emerald-500 text-white'}`}>
               {summary?.status === 'error' ? 'Errors' : summary?.status === 'warn' ? 'Warnings' : 'OK'}
             </span>
             <span className="text-slate-300">
-              {summary?.counts ? `${summary.counts.error || 0} error - ${summary.counts.warning || 0} warning - ${summary.counts.total || 0} total` : loading ? 'Loading QC...' : 'No QC summary'}
+              {summary?.counts ? `${summary.counts.error || 0} error - ${summary.counts.warning || 0} warning - ${summary.counts.total || 0} total` : loading ? 'Đang tải kiểm tra QC...' : 'Không có tổng hợp QC'}
             </span>
           </div>
-          {error ? <span className="text-[11px] text-red-200">{error}</span> : null}
+          {error ? <span className="text-[11px] text-rose-400 font-medium">{error}</span> : null}
         </div>
 
-        <div className="mb-2 flex flex-wrap gap-1">
+        <div className="mb-2.5 flex flex-wrap gap-1.5">
           {FILTERS.map((item) => (
             <button
               key={item.key}
               type="button"
-              className={`rounded border px-2 py-1 text-[10px] font-bold ${filter === item.key ? 'border-[#f1cc00] bg-[#f1cc00] text-black' : 'border-[#2a4166] text-slate-300 hover:bg-[#142540]'}`}
+              className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-all ${filter === item.key ? 'border-indigo-500 bg-indigo-600 text-white shadow-sm' : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700 hover:text-slate-200'}`}
               onClick={() => setFilter(item.key)}
             >
               {item.label}
@@ -145,41 +145,41 @@ export default function QcReportPanel({
         </div>
 
         {visibleIssues.length ? (
-          <div className="grid max-h-72 gap-1.5 overflow-y-auto pr-1">
+          <div className="grid max-h-72 gap-2 overflow-y-auto pr-1">
             {visibleIssues.map((issue) => {
               const metrics = issueMetricText(issue.metrics);
               return (
-                <div key={issue.id} className={`grid gap-1 rounded border p-2 ${issueTone(issue.status)}`}>
+                <div key={issue.id} className={`grid gap-1.5 rounded-lg border p-2.5 backdrop-blur-sm ${issueTone(issue.status)}`}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <button
                       type="button"
-                      className="text-left text-[11px] font-black underline-offset-2 hover:underline"
+                      className="text-left text-xs font-bold tracking-tight underline-offset-2 hover:underline"
                       onClick={() => onSelectIssue?.(issue)}
                     >
                       {reportLabel(issue.report)} - {issue.code}
                     </button>
-                    <span className="text-[10px] uppercase">{issue.status}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">{issue.status}</span>
                   </div>
-                  <div className="text-[11px] leading-4 text-slate-200">{issue.message}</div>
-                  <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-400">
+                  <div className="text-[11px] leading-relaxed text-slate-200">{issue.message}</div>
+                  <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] text-slate-400">
                     {issue.rowId ? <span>row {issue.rowId}</span> : null}
                     {Number.isFinite(Number(issue.start)) ? <span>{Number(issue.start).toFixed(2)}s</span> : null}
                     {metrics ? <span>{metrics}</span> : null}
                   </div>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5 pt-1">
                     {issue.rowId ? (
-                      <button type="button" className="rounded border border-slate-500/40 px-2 py-1 text-[10px] text-slate-100 hover:bg-slate-500/10" onClick={() => onSelectIssue?.(issue)}>
-                        Go row
+                      <button type="button" className="rounded-md border border-slate-700 bg-slate-800/80 px-2 py-0.5 text-[11px] font-medium text-slate-200 hover:bg-slate-700" onClick={() => onSelectIssue?.(issue)}>
+                        Xem dòng
                       </button>
                     ) : null}
                     {issue.action === 'repair_tts' ? (
-                      <button type="button" className="rounded border border-amber-400/50 px-2 py-1 text-[10px] text-amber-100 hover:bg-amber-400/10" onClick={() => onRepairTtsIssue?.(issue)}>
-                        Repair TTS
+                      <button type="button" className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-200 hover:bg-amber-500/20" onClick={() => onRepairTtsIssue?.(issue)}>
+                        Sửa TTS
                       </button>
                     ) : null}
                     {issue.action === 'rerun_tts' ? (
-                      <button type="button" className="rounded border border-sky-400/50 px-2 py-1 text-[10px] text-sky-100 hover:bg-sky-400/10" onClick={() => onRerunTtsIssue?.(issue)}>
-                        Rerun TTS
+                      <button type="button" className="rounded-md border border-indigo-500/40 bg-indigo-500/10 px-2 py-0.5 text-[11px] font-semibold text-indigo-200 hover:bg-indigo-500/20" onClick={() => onRerunTtsIssue?.(issue)}>
+                        Tạo lại TTS
                       </button>
                     ) : null}
                   </div>
@@ -188,8 +188,8 @@ export default function QcReportPanel({
             })}
           </div>
         ) : (
-          <div className="rounded border border-emerald-500/25 bg-emerald-500/10 px-2 py-1.5 text-[11px] text-emerald-100">
-            {loading ? 'Loading QC summary...' : 'No issue in this filter.'}
+          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-200">
+            {loading ? 'Đang tải thông tin QC...' : 'Không phát hiện vấn đề nào trong bộ lọc này.'}
           </div>
         )}
       </div>

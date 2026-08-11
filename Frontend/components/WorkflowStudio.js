@@ -2783,19 +2783,19 @@ function normalizeState(value) {
 
 function Button({ tone = 'dark', disabled, children, className = '', ...props }) {
   const tones = {
-    green: 'bg-[#16c970] text-white hover:bg-[#20df82]',
-    blue: 'bg-[#4389ee] text-white hover:bg-[#5a9bff]',
-    red: 'bg-[#ef4444] text-black hover:bg-[#fb5555]',
-    yellow: 'bg-[#f1cc00] text-black hover:bg-[#ffdf19]',
-    purple: 'bg-[#8b5cf6] text-white hover:bg-[#9b72ff]',
-    dark: 'bg-[#566173] text-white hover:bg-[#667386]',
+    green: 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-900/20',
+    blue: 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-900/20',
+    red: 'bg-rose-600 text-white hover:bg-rose-500 shadow-rose-900/20',
+    yellow: 'bg-amber-500 text-slate-950 font-bold hover:bg-amber-400 shadow-amber-900/20',
+    purple: 'bg-purple-600 text-white hover:bg-purple-500 shadow-purple-900/20',
+    dark: 'bg-slate-800/90 text-slate-200 hover:bg-slate-700/90 hover:text-white border border-slate-700/60',
   };
 
   return (
     <button
       type="button"
       disabled={disabled}
-      className={`inline-flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-[6px] px-2.5 text-[12px] font-black shadow-[0_0_0_1px_rgba(255,255,255,0.10)] transition disabled:cursor-not-allowed disabled:opacity-45 ${tones[tone]} ${className}`}
+      className={`inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg px-3 text-[12px] font-semibold tracking-tight shadow-md transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${tones[tone] || tones.dark} ${className}`}
       {...props}
     >
       {children}
@@ -2806,7 +2806,7 @@ function Button({ tone = 'dark', disabled, children, className = '', ...props })
 function Field({ label, children }) {
   return (
     <label className="grid gap-1.5 text-xs text-slate-200">
-      <span className="font-semibold text-slate-300">{label}</span>
+      <span className="font-semibold text-slate-300 tracking-tight">{label}</span>
       {children}
     </label>
   );
@@ -2816,7 +2816,7 @@ function Input(props) {
   return (
     <input
       {...props}
-      className={`h-9 w-full rounded-[4px] border border-[#263a5d] bg-[#0b1426] px-2.5 text-xs text-white outline-none focus:border-[#f1cc00] ${props.className || ''}`}
+      className={`h-9 w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 text-xs text-slate-100 placeholder-slate-500 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 ${props.className || ''}`}
     />
   );
 }
@@ -2826,14 +2826,14 @@ function Toggle({ checked, onChange, label, offLabel = 'Tắt', onLabel = 'Bật
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className={`flex min-h-[34px] w-full items-center justify-between gap-3 rounded-[6px] border px-2.5 text-left text-xs font-bold transition ${
+      className={`flex min-h-[36px] w-full items-center justify-between gap-3 rounded-lg border px-3 text-left text-xs font-semibold transition-all ${
         checked
-          ? 'border-[#f1cc00] bg-[#221f08] text-white'
-          : 'border-[#263a5d] bg-[#0b1426] text-slate-300'
+          ? 'border-indigo-500/50 bg-indigo-950/40 text-indigo-200 shadow-sm'
+          : 'border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700'
       }`}
     >
       <span>{label}</span>
-      <span className={`rounded-[4px] px-2 py-1 text-[11px] font-black ${checked ? 'bg-[#f1cc00] text-black' : 'bg-[#263a5d] text-white'}`}>
+      <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold transition-all ${checked ? 'bg-indigo-500 text-white shadow-sm' : 'bg-slate-800 text-slate-400'}`}>
         {checked ? onLabel : offLabel}
       </span>
     </button>
@@ -2850,7 +2850,7 @@ function normalizeHexColor(value, fallback = '#ffffff') {
 function ColorPicker({ value, onChange, disabled = false, swatches = COLOR_SWATCHES }) {
   const color = normalizeHexColor(value);
   return (
-    <div className={`rounded-[6px] border border-[#263a5d] bg-[#071020] p-2 ${disabled ? 'opacity-45' : ''}`}>
+    <div className={`rounded-xl border border-slate-800 bg-slate-900/80 p-2.5 backdrop-blur-md ${disabled ? 'opacity-40' : ''}`}>
       <div className="grid grid-cols-8 gap-1.5">
         {swatches.map((item) => {
           const active = normalizeHexColor(item) === color;
@@ -2862,14 +2862,14 @@ function ColorPicker({ value, onChange, disabled = false, swatches = COLOR_SWATC
               title={item}
               aria-label={`Chọn màu ${item}`}
               onClick={() => onChange(normalizeHexColor(item))}
-              className={`h-6 rounded-[4px] transition ${active ? 'ring-2 ring-[#facc15] ring-offset-1 ring-offset-[#071020]' : 'ring-1 ring-white/12 hover:ring-white/40'}`}
+              className={`h-6 rounded-md transition-transform ${active ? 'scale-110 ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-900' : 'ring-1 ring-white/10 hover:scale-105 hover:ring-white/30'}`}
               style={{ backgroundColor: item }}
             />
           );
         })}
       </div>
-      <div className="mt-2 grid grid-cols-[32px_1fr] items-center gap-2">
-        <span className="h-7 rounded-[4px] ring-1 ring-white/15" style={{ backgroundColor: color }} />
+      <div className="mt-2.5 grid grid-cols-[32px_1fr] items-center gap-2">
+        <span className="h-7 rounded-md ring-1 ring-white/20 shadow-inner" style={{ backgroundColor: color }} />
         <Input
           value={color}
           disabled={disabled}
@@ -2886,7 +2886,7 @@ function TextArea(props) {
   return (
     <textarea
       {...props}
-      className={`min-h-[82px] w-full resize-y rounded-[4px] border border-[#263a5d] bg-[#0b1426] px-2.5 py-2 text-xs text-white outline-none focus:border-[#f1cc00] ${props.className || ''}`}
+      className={`min-h-[82px] w-full resize-y rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 ${props.className || ''}`}
     />
   );
 }
@@ -2937,7 +2937,7 @@ function GroqKeyManager({ config, onChange, placeholder = 'Khóa Groq' }) {
               type="button"
               title="Xóa khóa"
               aria-label="Xóa khóa"
-              className="flex h-9 w-[34px] items-center justify-center rounded-[4px] border border-[#3a4560] bg-[#111c2f] text-slate-200 hover:border-[#ff5959] hover:text-[#ff5959]"
+              className="flex h-9 w-[34px] items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 transition-colors hover:border-rose-500/50 hover:bg-rose-500/10 hover:text-rose-400"
               onClick={() => removeLine(index)}
             >
               <Trash2 className="h-4 w-4" />
@@ -2948,13 +2948,13 @@ function GroqKeyManager({ config, onChange, placeholder = 'Khóa Groq' }) {
       <div className="flex items-center justify-between gap-2">
         <button
           type="button"
-          className="inline-flex h-8 items-center gap-1.5 rounded-[5px] border border-[#2f4c7d] bg-[#102342] px-2.5 text-xs font-bold text-white hover:border-[#4d8dff]"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 text-xs font-semibold text-indigo-300 transition-all hover:bg-indigo-500/20"
           onClick={addLine}
         >
           <Plus className="h-4 w-4" />
           Thêm khóa
         </button>
-        <span className="text-xs text-slate-400">{activeCount} khóa</span>
+        <span className="text-xs font-medium text-slate-400">{activeCount} khóa</span>
       </div>
     </div>
   );
@@ -3006,7 +3006,7 @@ function AssemblyAiKeyManager({ config, onChange, placeholder = 'Khóa AssemblyA
               type="button"
               title="Xóa khóa"
               aria-label="Xóa khóa"
-              className="flex h-9 w-[34px] items-center justify-center rounded-[4px] border border-[#3a4560] bg-[#111c2f] text-slate-200 hover:border-[#ff5959] hover:text-[#ff5959]"
+              className="flex h-9 w-[34px] items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 transition-colors hover:border-rose-500/50 hover:bg-rose-500/10 hover:text-rose-400"
               onClick={() => removeLine(index)}
             >
               <Trash2 className="h-4 w-4" />
@@ -3017,13 +3017,13 @@ function AssemblyAiKeyManager({ config, onChange, placeholder = 'Khóa AssemblyA
       <div className="flex items-center justify-between gap-2">
         <button
           type="button"
-          className="inline-flex h-8 items-center gap-1.5 rounded-[5px] border border-[#2f4c7d] bg-[#102342] px-2.5 text-xs font-bold text-white hover:border-[#4d8dff]"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 text-xs font-semibold text-indigo-300 transition-all hover:bg-indigo-500/20"
           onClick={addLine}
         >
           <Plus className="h-4 w-4" />
           Thêm khóa
         </button>
-        <span className="text-xs text-slate-400">{activeCount} khóa</span>
+        <span className="text-xs font-medium text-slate-400">{activeCount} khóa</span>
       </div>
     </div>
   );
@@ -3033,40 +3033,40 @@ function Select(props) {
   return (
     <select
       {...props}
-      className={`h-9 w-full rounded-[4px] border border-[#263a5d] bg-[#0b1426] px-2.5 text-xs text-white outline-none focus:border-[#f1cc00] ${props.className || ''}`}
+      className={`h-9 w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 text-xs text-slate-100 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 ${props.className || ''}`}
     />
   );
 }
 
 function Panel({ title, children }) {
   return (
-    <details className="group rounded-[5px] border border-[#23385d] bg-[#0c1628]">
-      <summary className="flex min-h-[36px] cursor-pointer list-none items-center gap-2 px-2.5 text-[13px] font-black text-white">
-        <ChevronRight className="h-3.5 w-3.5 text-white transition group-open:rotate-90" />
+    <details className="group rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-md transition-all">
+      <summary className="flex min-h-[40px] cursor-pointer list-none items-center gap-2 px-3 text-xs font-bold text-slate-200 transition-colors hover:text-white">
+        <ChevronRight className="h-4 w-4 text-indigo-400 transition-transform duration-200 group-open:rotate-90" />
         {title}
       </summary>
-      <div className="grid gap-2 border-t border-[#21365a] p-2">{children}</div>
+      <div className="grid gap-3 border-t border-slate-800/60 p-3 animate-fade-in">{children}</div>
     </details>
   );
 }
 
 function Modal({ title, children, footer, onClose, className = '' }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-md px-4 animate-fade-in">
       <div
-        className={`flex max-h-[82vh] w-full max-w-[640px] flex-col rounded-[8px] border border-[#28436d] bg-[#071020] shadow-[0_24px_90px_rgba(0,0,0,0.55)] ${className}`}
+        className={`flex max-h-[85vh] w-full max-w-[640px] flex-col rounded-2xl border border-slate-800 bg-slate-900/95 shadow-2xl shadow-black/80 ${className}`}
         onClick={(event) => event.stopPropagation()}
         onKeyDown={(event) => event.stopPropagation()}
       >
-        <div className="flex h-12 items-center justify-between border-b border-[#28436d] px-4">
-          <h3 className="text-base font-semibold text-white">{title}</h3>
-          <button type="button" onClick={onClose} className="rounded-md p-1 text-white hover:bg-white/10">
+        <div className="flex h-14 items-center justify-between border-b border-slate-800/80 px-5">
+          <h3 className="text-base font-bold text-slate-100 tracking-tight">{title}</h3>
+          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white">
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="grid gap-4 overflow-auto p-4">{children}</div>
-        <div className="flex items-center justify-end gap-3 border-t border-[#1d3152] px-4 py-3">
-          <Button onClick={onClose}>Hủy</Button>
+        <div className="grid gap-4 overflow-auto p-5">{children}</div>
+        <div className="flex items-center justify-end gap-3 border-t border-slate-800/80 px-5 py-3.5 bg-slate-950/40 rounded-b-2xl">
+          <Button onClick={onClose} tone="dark">Hủy</Button>
           {footer}
         </div>
       </div>
@@ -4748,6 +4748,74 @@ export default function WorkflowStudio() {
       addLog(`Lỗi thêm SRT: ${error.message || 'không đọc được file'}`);
       showAlert('Không thể thêm SRT', error.message || 'Không đọc được file SRT.');
     }
+  };
+
+  const envFileInputRef = useRef(null);
+
+  const exportEnvConfig = () => {
+    try {
+      const exportPayload = {
+        app: 'DubFlow Studio',
+        dubflow_config_version: '1.0',
+        exported_at: new Date().toISOString(),
+        config: config || {},
+      };
+      const jsonString = JSON.stringify(exportPayload, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const dateStr = new Date().toISOString().slice(0, 10);
+      link.download = `dubflow-config-env-${dateStr}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(jsonString).catch(() => {});
+      }
+
+      addLog('💾 Đã trích xuất toàn bộ cấu hình môi trường & API Keys ra file JSON.');
+      showAlert('Trích xuất thành công', `Đã xuất toàn bộ biến môi trường & API Keys ra file dubflow-config-env-${dateStr}.json và sao chép vào bộ nhớ tạm!`);
+    } catch (err) {
+      playErrorSound();
+      showAlert('Lỗi trích xuất', `Không thể xuất file cấu hình: ${err.message}`);
+    }
+  };
+
+  const handleImportEnvConfigFile = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result;
+        if (typeof content !== 'string') return;
+        const parsed = JSON.parse(content);
+        const importedConfig = parsed.config || parsed;
+
+        if (typeof importedConfig !== 'object' || importedConfig === null) {
+          throw new Error('Cấu trúc file JSON không hợp lệ.');
+        }
+
+        const nextConfig = { ...config, ...importedConfig };
+        patchConfig(importedConfig);
+        if (typeof window !== 'undefined') {
+          safeLocalStorageSet(SETTINGS_STORAGE_KEY, JSON.stringify(savedSettingsFromConfig(nextConfig)));
+        }
+
+        addLog('✅ Đã nạp thành công toàn bộ biến môi trường, API keys và cấu hình ứng dụng!');
+        showAlert('Nhập cấu hình thành công', 'Đã nạp toàn bộ biến môi trường, API keys và cấu hình từ file JSON!');
+      } catch (err) {
+        playErrorSound();
+        showAlert('Lỗi nhập cấu hình', `File JSON không hợp lệ: ${err.message}`);
+      } finally {
+        if (event.target) event.target.value = '';
+      }
+    };
+    reader.readAsText(file);
   };
 
   const saveProject = () => {
@@ -7478,9 +7546,9 @@ export default function WorkflowStudio() {
     || (ttsReport?.placementMode === 'continuous_voice' && Number(ttsReport?.failedSegmentCount || 0) === 0);
 
   return (
-    <div className="h-screen min-h-[760px] overflow-hidden bg-[#071020] text-white" onClick={() => { setContextMenu(null); setHistoryOpen(false); }}>
-      <main className="flex h-full min-w-0 flex-col bg-[#071020]">
-        <header className="relative shrink-0 border-b border-[#162949] bg-[#071020] px-4 pb-4 pt-2 2xl:px-5">
+    <div className="h-screen min-h-[760px] overflow-hidden bg-slate-950 text-slate-100 font-sans" onClick={() => { setContextMenu(null); setHistoryOpen(false); }}>
+      <main className="flex h-full min-w-0 flex-col bg-slate-950/80 backdrop-blur-xl">
+        <header className="relative shrink-0 border-b border-slate-800/80 bg-slate-900/70 px-4 pb-3.5 pt-2.5 backdrop-blur-md 2xl:px-5">
           <div className="grid gap-2">
             <div className="flex min-h-[34px] items-center gap-2 overflow-x-auto overflow-y-hidden pr-2">
             <Button tone={workspaceMode === 'project' ? 'yellow' : 'dark'} onClick={() => setWorkspaceMode('project')}>
@@ -7489,14 +7557,14 @@ export default function WorkflowStudio() {
             <Button tone={workspaceMode === 'standalone_tts' ? 'yellow' : 'dark'} onClick={() => setWorkspaceMode('standalone_tts')}>
               <Mic2 className="h-4 w-4" />TTS riêng lẻ
             </Button>
-            <div className="mx-1 h-8 w-px shrink-0 bg-[#20385f]" />
+            <div className="mx-1 h-8 w-px shrink-0 bg-slate-800" />
             {workspaceMode === 'project' ? (
               <>
             <Button tone="yellow" onClick={openNewProjectModal}>New</Button>
             <input
               value={state.projectName || ''}
               onChange={(event) => patchState({ projectName: event.target.value })}
-              className="h-7 w-[92px] shrink-0 rounded-[5px] border border-[#263a5d] bg-[#0b1426] px-2 text-xs font-semibold text-white outline-none focus:border-[#f1cc00]"
+              className="h-8 w-[100px] shrink-0 rounded-lg border border-slate-800 bg-slate-900/90 px-2.5 text-xs font-semibold text-slate-100 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
               placeholder="Project name"
             />
             <div className="relative shrink-0">
@@ -7514,7 +7582,7 @@ export default function WorkflowStudio() {
                   });
                   setHistoryOpen((open) => !open);
                 }}
-                className="flex h-7 w-[148px] items-center justify-between gap-2 rounded-[5px] border border-[#263a5d] bg-[#0b1426] px-2 text-left text-xs font-semibold text-white outline-none hover:border-[#f1cc00]"
+                className="flex h-8 w-[152px] items-center justify-between gap-2 rounded-lg border border-slate-800 bg-slate-900/90 px-2.5 text-left text-xs font-semibold text-slate-200 outline-none hover:border-slate-700 transition-all"
                 title="History"
               >
                 <span className="truncate">{state.projectName || 'History'}</span>
@@ -7522,21 +7590,21 @@ export default function WorkflowStudio() {
               </button>
               {historyOpen ? (
                 <div
-                  className="fixed z-[100] overflow-hidden rounded-[8px] border border-[#263a5d] bg-[#071020] shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
+                  className="fixed z-[100] overflow-hidden rounded-xl border border-slate-800 bg-slate-900/95 shadow-2xl backdrop-blur-md"
                   style={{ top: historyMenuPosition.top, left: historyMenuPosition.left, width: historyMenuPosition.width }}
                   onClick={(event) => event.stopPropagation()}
                 >
-                  <div className="border-b border-[#1d3355] px-3 py-2 text-xs font-black uppercase text-[#f1cc00]">History</div>
+                  <div className="border-b border-slate-800 px-3 py-2 text-xs font-bold uppercase tracking-wider text-indigo-400">History</div>
                   <div className="max-h-[330px] overflow-y-auto p-1">
                     {projects.length ? projects.map((project) => (
-                      <div key={project.id} className={`group flex items-center gap-1 rounded-[6px] ${project.id === state.projectId ? 'bg-[#f1cc00]/12' : 'hover:bg-white/5'}`}>
+                      <div key={project.id} className={`group flex items-center gap-1 rounded-lg ${project.id === state.projectId ? 'bg-indigo-600/20 text-indigo-200' : 'hover:bg-slate-800/50'}`}>
                         <button
                           type="button"
                           onClick={() => {
                             setHistoryOpen(false);
                             if (project.id !== state.projectId) loadProject(project.id);
                           }}
-                          className="min-w-0 flex-1 truncate px-2.5 py-2 text-left text-xs font-semibold text-white"
+                          className="min-w-0 flex-1 truncate px-2.5 py-2 text-left text-xs font-semibold text-slate-200"
                           title={project.name}
                         >
                           {project.name}
@@ -7547,7 +7615,7 @@ export default function WorkflowStudio() {
                             event.stopPropagation();
                             deleteProjectById(project.id);
                           }}
-                          className="mr-1 grid h-7 w-7 shrink-0 place-items-center rounded-[5px] text-red-300 opacity-80 hover:bg-red-500/15 hover:text-red-100 group-hover:opacity-100"
+                          className="mr-1 grid h-7 w-7 shrink-0 place-items-center rounded-md text-rose-400 opacity-80 hover:bg-rose-500/15 hover:text-rose-300 group-hover:opacity-100"
                           title="Xóa dự án"
                           aria-label="Xóa dự án"
                         >
@@ -7565,12 +7633,23 @@ export default function WorkflowStudio() {
             <Button onClick={clearRows}>Reset</Button>
             <Button tone="red" onClick={deleteVideo} disabled={!hasVideo}>Xóa video</Button>
 
-            <div className="mx-1 h-8 w-px shrink-0 bg-[#20385f]" />
+            <div className="mx-1 h-8 w-px shrink-0 bg-slate-800" />
+            <div className="flex shrink-0 items-center gap-2">
+            <Button tone="dark" title="Xuất toàn bộ API Keys & biến môi trường ra file JSON" onClick={exportEnvConfig}>
+              <Download className="h-4 w-4 text-indigo-400" />Xuất Config
+            </Button>
+            <Button tone="dark" title="Nhập API Keys & biến môi trường từ file JSON" onClick={() => envFileInputRef.current?.click()}>
+              <Upload className="h-4 w-4 text-emerald-400" />Nhập Config
+            </Button>
+            <input ref={envFileInputRef} type="file" accept=".json" className="hidden" onChange={handleImportEnvConfigFile} />
+            </div>
+
+            <div className="mx-1 h-8 w-px shrink-0 bg-slate-800" />
             <div className="flex shrink-0 items-center gap-2">
             <Button onClick={() => { setSttToolTab('stt'); setActiveModal('stt'); }}>Tạo phụ đề gốc</Button>
             <Button onClick={() => { setSubtitleToolTab('translate'); setActiveModal('subtitleTools'); }}>OCR / Dịch</Button>
             <Button onClick={() => setActiveModal('tts')}>Lồng tiếng</Button>
-            <Button onClick={() => setActiveModal('export')}>Xuất</Button>
+            <Button tone="blue" onClick={() => setActiveModal('export')}>Xuất</Button>
             </div>
               </>
             ) : (
@@ -7579,7 +7658,7 @@ export default function WorkflowStudio() {
             {false && state.busy ? (
               <>
                 <Button tone="red" onClick={stopCurrentTask}><Square className="h-3.5 w-3.5" />Dừng</Button>
-                <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[#f1cc00]" />
+                <Loader2 className="h-5 w-5 shrink-0 animate-spin text-indigo-400" />
               </>
             ) : null}
             </div>
@@ -7591,9 +7670,9 @@ export default function WorkflowStudio() {
             </div>
           </div>
           {false && state.busy ? (
-            <div className="absolute bottom-1 right-4 flex h-6 items-center gap-2 rounded-[6px] border border-[#263a5d] bg-[#071020] px-2">
+            <div className="absolute bottom-1 right-4 flex h-6 items-center gap-2 rounded-lg border border-slate-800 bg-slate-900 px-2">
               <Button className="h-5 px-2 text-[11px]" tone="red" onClick={stopCurrentTask}><Square className="h-3 w-3" />Dừng</Button>
-              <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#f1cc00]" />
+              <Loader2 className="h-4 w-4 shrink-0 animate-spin text-indigo-400" />
             </div>
           ) : null}
         </header>
@@ -7606,21 +7685,21 @@ export default function WorkflowStudio() {
             googleCloudConfig={googleCloudConfig()}
           />
         ) : (
-          <div className="grid min-h-0 flex-1 grid-cols-[minmax(640px,1fr)_minmax(318px,23vw)] gap-3 px-3 pb-3 pt-3 xl:px-4 2xl:grid-cols-[minmax(760px,1fr)_380px] 2xl:px-5">
-            <section className="grid min-h-0 min-w-0 grid-rows-[auto_minmax(280px,1fr)_minmax(230px,36vh)] gap-2.5">
+          <div className="grid min-h-0 flex-1 grid-cols-[minmax(640px,1fr)_minmax(318px,23vw)] gap-3.5 px-3.5 pb-3.5 pt-3.5 xl:px-4.5 2xl:grid-cols-[minmax(760px,1fr)_380px] 2xl:px-5">
+            <section className="grid min-h-0 min-w-0 grid-rows-[auto_minmax(280px,1fr)_minmax(230px,36vh)] gap-3">
               <button
                 type="button"
                 onClick={() => {
                   const value = source.mode === 'local' ? source.videoPath : source.videoUrl;
                   if (value) showAlert('Đường dẫn video', value);
                 }}
-                className="h-5 truncate text-center text-[15px] font-black text-[#f1cc00] outline-none hover:underline"
+                className="h-6 truncate text-center text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-amber-300 outline-none hover:underline"
               >
                 {source.title || fileNameFromPath(source.videoPath) || fileNameFromPath(source.videoUrl) || ''}
               </button>
-              <div className="flex min-h-0 flex-col overflow-hidden rounded-[8px] border border-[#20385f] bg-[#0b1528] p-3 shadow-[0_18px_50px_rgba(0,0,0,0.18)]">
+              <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 p-3.5 shadow-2xl shadow-black/40 backdrop-blur-md">
                 <div
-                  className="relative flex min-h-0 flex-1 items-center justify-center rounded-[8px] border border-[#1d3152] bg-[#0b1324]"
+                  className="relative flex min-h-0 flex-1 items-center justify-center rounded-xl border border-slate-800/80 bg-slate-950/80 shadow-inner"
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={(event) => {
                     event.preventDefault();
@@ -7897,8 +7976,8 @@ export default function WorkflowStudio() {
                   )}
                 </div>
 
-                <div className="mt-3 grid shrink-0 grid-cols-[64px_1fr_64px] items-center gap-4">
-                  <span className="font-mono text-sm">{formatClock(state.currentTime)}</span>
+                <div className="mt-3 grid shrink-0 grid-cols-[64px_1fr_64px] items-center gap-4 text-slate-300">
+                  <span className="font-mono text-xs">{formatClock(state.currentTime)}</span>
                   <input
                     type="range"
                     min="0"
@@ -7908,12 +7987,12 @@ export default function WorkflowStudio() {
                       const time = Number(event.target.value);
                       seekTo(time);
                     }}
-                    className="h-2 accent-sky-400"
+                    className="h-2 accent-indigo-500 cursor-pointer"
                   />
-                  <span className="text-right font-mono text-sm">{formatClock(job.durationSeconds)}</span>
+                  <span className="text-right font-mono text-xs">{formatClock(job.durationSeconds)}</span>
                 </div>
 
-                <div className="mt-3 flex shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-2 overflow-hidden">
+                <div className="mt-3 flex shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-2 overflow-hidden bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
                   <Button className="h-8 rounded-full px-4 text-xs" onClick={() => seekTo((state.currentTime || 0) - 5)} disabled={!renderedMediaSrc}>{'<<'}</Button>
                   <Button
                     className="h-7 rounded-full px-3 text-xs"
@@ -7922,25 +8001,25 @@ export default function WorkflowStudio() {
                   >
                     {config.sourceAudioEnabled ? 'Tắt âm gốc' : 'Bật âm gốc'}
                   </Button>
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-xs text-slate-300 font-medium">
                     <span>Âm gốc:</span>
-                    <input type="range" min="0" max="100" value={config.originalPreviewVolume} onChange={(event) => patchConfig({ originalPreviewVolume: Number(event.target.value), sourceAudioEnabled: Number(event.target.value) > 0 })} className="w-24 accent-sky-400" />
-                    <span>{config.sourceAudioEnabled ? config.originalPreviewVolume : 0}%</span>
+                    <input type="range" min="0" max="100" value={config.originalPreviewVolume} onChange={(event) => patchConfig({ originalPreviewVolume: Number(event.target.value), sourceAudioEnabled: Number(event.target.value) > 0 })} className="w-20 accent-indigo-500" />
+                    <span className="w-8 font-mono text-slate-400">{config.sourceAudioEnabled ? config.originalPreviewVolume : 0}%</span>
                   </div>
                   <button
                     type="button"
                     onClick={togglePlay}
                     disabled={!renderedMediaSrc}
-                    className="flex h-10 min-w-[98px] items-center justify-center gap-2 rounded-full bg-[#20c760] px-6 font-black text-white disabled:opacity-40"
+                    className="flex h-10 min-w-[104px] items-center justify-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-500 px-6 font-bold text-white shadow-lg shadow-emerald-950/50 transition-all active:scale-95 disabled:opacity-40"
                   >
                     {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                     {playing ? 'Pause' : 'Play'}
                   </button>
                   <Button className="h-8 rounded-full px-4 text-xs" onClick={() => seekTo((state.currentTime || 0) + 5)} disabled={!renderedMediaSrc}>{'>>'}</Button>
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-xs text-slate-300 font-medium">
                     <span>Giọng đọc:</span>
-                    <input type="range" min="0" max="100" value={config.dubbedAudioEnabled ? config.dubbedPreviewVolume : 0} onChange={(event) => patchConfig({ dubbedPreviewVolume: Number(event.target.value), dubbedAudioEnabled: Number(event.target.value) > 0 })} className="w-24 accent-sky-400" />
-                    <span>{config.dubbedAudioEnabled && dubbedAudioSrc ? config.dubbedPreviewVolume : 0}%</span>
+                    <input type="range" min="0" max="100" value={config.dubbedAudioEnabled ? config.dubbedPreviewVolume : 0} onChange={(event) => patchConfig({ dubbedPreviewVolume: Number(event.target.value), dubbedAudioEnabled: Number(event.target.value) > 0 })} className="w-20 accent-indigo-500" />
+                    <span className="w-8 font-mono text-slate-400">{config.dubbedAudioEnabled && dubbedAudioSrc ? config.dubbedPreviewVolume : 0}%</span>
                   </div>
                   <Button
                     className="h-7 rounded-full px-3 text-xs"
@@ -7952,19 +8031,19 @@ export default function WorkflowStudio() {
                 </div>
               </div>
 
-              <div className="flex min-h-0 flex-col overflow-hidden rounded-[8px] border border-[#20385f] bg-[#0b1528] shadow-[0_18px_50px_rgba(0,0,0,0.14)]">
-                <div className="grid grid-cols-[64px_minmax(176px,230px)_1fr] border-b border-[#20385f] bg-[#0d1729] text-center text-[12px] font-black text-[#f1cc00]">
-                  <div className="border-r border-[#20385f] py-1.5">#</div>
-                  <div className="border-r border-[#20385f] py-1.5">Timeline</div>
-                  <div className="flex items-center justify-center gap-2 py-1.5">
+              <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 shadow-2xl shadow-black/40 backdrop-blur-md">
+                <div className="grid grid-cols-[64px_minmax(176px,230px)_1fr] border-b border-slate-800 bg-slate-900/90 text-center text-xs font-bold text-slate-200">
+                  <div className="border-r border-slate-800 py-2">#</div>
+                  <div className="border-r border-slate-800 py-2">Timeline</div>
+                  <div className="flex items-center justify-between px-3 py-1.5">
                     {ttsReport ? (
-                      <span className={`rounded-[4px] px-2 py-0.5 text-[11px] ${ttsReportPass ? 'bg-emerald-500 text-black' : 'bg-red-500 text-white'}`}>
+                      <span className={`rounded-md px-2.5 py-0.5 text-[11px] font-bold ${ttsReportPass ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}`}>
                         TTS timing: {ttsReportPass ? 'OK' : `${ttsReport.failedSegmentCount || 0} cảnh báo, đã đánh dấu ${ttsWarningRows}`}
                       </span>
-                    ) : null}
-                    <div className="flex rounded-[6px] border border-[#28436d] bg-[#071020] p-0.5 text-[11px]">
-                      <button type="button" className={`rounded-[4px] px-2 py-0.5 ${timelineTab === 'all' ? 'bg-[#f1cc00] text-black' : 'text-slate-300 hover:bg-[#142540]'}`} onClick={() => setTimelineTab('all')}>Tất cả</button>
-                      <button type="button" className={`flex items-center gap-1 rounded-[4px] px-2 py-0.5 ${activeModal === 'bulkEditV2' && bulkEditMode === 'ttsRepair' ? 'bg-[#f1cc00] text-black' : 'text-slate-300 hover:bg-[#142540]'}`} onClick={openTtsRepairEditor}>
+                    ) : <span />}
+                    <div className="flex rounded-lg border border-slate-800 bg-slate-950/60 p-0.5 text-[11px]">
+                      <button type="button" className={`rounded-md px-2.5 py-1 font-semibold transition-all ${timelineTab === 'all' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`} onClick={() => setTimelineTab('all')}>Tất cả</button>
+                      <button type="button" className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-semibold transition-all ${activeModal === 'bulkEditV2' && bulkEditMode === 'ttsRepair' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`} onClick={openTtsRepairEditor}>
                         <Pencil className="h-3 w-3" />
                         Chỉnh sửa {ttsRepairRows.length ? `(${ttsRepairRows.length})` : ''}
                       </button>
@@ -8132,14 +8211,14 @@ export default function WorkflowStudio() {
                     const repairBasketItem = ttsRepairById.get(String(row.id));
                     const repairChecked = repairBasketItem ? repairBasketItem.selected !== false : (repairIssue ? repairIssue.selectedByDefault !== false : false);
                     const rowTone = invalid
-                      ? 'bg-[#6b2020] text-white'
+                      ? 'bg-rose-900/60 text-white border-rose-700/50'
                       : ttsBad
-                        ? (selected ? 'bg-red-600 text-white ring-2 ring-[#f1cc00] ring-inset' : 'bg-red-950/90 text-red-50')
+                        ? (selected ? 'bg-rose-600 text-white ring-2 ring-rose-400 ring-inset shadow-lg' : 'bg-rose-950/70 text-rose-100 border-rose-900/40')
                         : selected
-                          ? 'bg-[#f1cc00] text-black'
+                          ? 'bg-indigo-600/90 text-white font-semibold ring-2 ring-indigo-400/80 shadow-lg shadow-indigo-950/60 border-indigo-500'
                           : active
-                            ? 'bg-[#101b31] text-white'
-                            : 'bg-[#0c1629] text-white';
+                            ? 'bg-indigo-950/60 text-indigo-100 border-indigo-500/30'
+                            : 'bg-slate-900/50 text-slate-100 hover:bg-slate-800/60 border-slate-800/80';
                     return (
                       <div
                         key={row.id}
@@ -8153,24 +8232,24 @@ export default function WorkflowStudio() {
                           selectRow(row);
                           setContextMenu({ rowId: row.id, ...contextMenuPosition(event.clientX, event.clientY) });
                         }}
-                        className={`grid grid-cols-[64px_minmax(176px,230px)_1fr] border-b border-[#162949] text-[13px] ${rowTone}`}
+                        className={`grid grid-cols-[64px_minmax(176px,230px)_1fr] border-b border-slate-800/80 text-[13px] transition-all duration-150 ${rowTone}`}
                         style={row.style?.backgroundOpacity ? { backgroundColor: hexToRgba(row.style.backgroundColor, row.style.backgroundOpacity) } : undefined}
                         onClick={() => {
                           selectRow(row);
                         }}
                       >
-                        <div className="flex cursor-grab flex-col items-center justify-center gap-1 border-r border-[#20385f] px-2 py-1.5 text-center">
-                          <span>{row.index}</span>
+                        <div className="flex cursor-grab flex-col items-center justify-center gap-1 border-r border-slate-800/80 px-2 py-1.5 text-center">
+                          <span className="font-mono text-xs">{row.index}</span>
                           <input
                             type="checkbox"
                             checked={repairChecked}
                             title={repairIssue ? repairIssue.reason : 'Đưa vào danh sách chỉnh sửa'}
                             onClick={(event) => event.stopPropagation()}
                             onChange={(event) => toggleTtsRepairRow(row.id, event.target.checked)}
-                            className="h-3.5 w-3.5 accent-[#f1cc00]"
+                            className="h-3.5 w-3.5 accent-indigo-500"
                           />
                         </div>
-                        <div className="border-r border-[#20385f] px-2 py-1.5 font-mono text-[12px]">
+                        <div className="border-r border-slate-800/80 px-2.5 py-2 font-mono text-[12px] text-slate-300">
                           {formatSrtTime(row.start)} --&gt; {formatSrtTime(row.end)}
                         </div>
                         {editingRowId === row.id ? (
@@ -8199,7 +8278,7 @@ export default function WorkflowStudio() {
                               }
                             }}
                             onBlur={() => commitEdit(false)}
-                            className="min-h-[34px] w-full resize-none bg-black/15 px-2 py-1.5 outline-none"
+                            className="min-h-[34px] w-full resize-none bg-slate-950/80 px-2.5 py-2 outline-none text-white border border-indigo-500 rounded-md"
                           />
                         ) : (
                           <div className="min-w-0">
@@ -8215,31 +8294,31 @@ export default function WorkflowStudio() {
                                   ? `Cảnh báo TTS: ${ttsReasons.join(', ') || 'kiểm tra sync'}. Unit ${row.ttsSync?.ttsUnitId || row.ttsSync?.ttsUnitIndex}.`
                                   : translationTitle || undefined
                               }
-                              className="min-h-[34px] w-full px-2 py-1.5 text-left outline-none"
+                              className="min-h-[34px] w-full px-2.5 py-2 text-left outline-none"
                             >
-                              <span>{rowText(row, finalField) || <span className="text-slate-500">(trống)</span>}</span>
+                              <span className="leading-relaxed">{rowText(row, finalField) || <span className="text-slate-500 font-italic">(trống)</span>}</span>
                               {row.validationStatus || row.status === 'verified' || row.status === 'needs_review' ? (
-                                <span className={`ml-2 rounded px-1.5 py-0.5 text-[10px] font-bold ${row.status === 'verified' ? 'bg-emerald-500 text-black' : 'bg-red-500 text-white'}`}>
+                                <span className={`ml-2 rounded-md px-2 py-0.5 text-[10px] font-bold ${row.status === 'verified' ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white'}`}>
                                   {row.status === 'verified' ? 'verified' : 'needs review'}
                                 </span>
                               ) : null}
                               {ttsBadge ? (
-                                <span className={`ml-2 rounded px-1.5 py-0.5 text-[10px] font-bold ${ttsBad ? 'bg-red-500 text-white' : 'bg-amber-500 text-black'}`}>
+                                <span className={`ml-2 rounded-md px-2 py-0.5 text-[10px] font-bold ${ttsBad ? 'bg-rose-500 text-white' : 'bg-amber-500 text-slate-950'}`}>
                                   {ttsBadge}
                                 </span>
                               ) : null}
                               {translationBadge ? (
-                                <span className="ml-2 rounded bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-black" title={translationTitle}>
+                                <span className="ml-2 rounded-md bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-slate-950" title={translationTitle}>
                                   {translationBadge}
                                 </span>
                               ) : null}
                             </button>
                             {Array.isArray(row.sourceIds) && row.sourceIds.length ? (
-                              <details className="border-t border-white/10 px-2 py-1 text-[11px] opacity-80" onClick={(event) => event.stopPropagation()}>
-                                <summary className="cursor-pointer select-none">Nguồn: {row.sourceIds.join(', ')}</summary>
+                              <details className="border-t border-slate-800/50 px-2.5 py-1 text-[11px] text-slate-400 opacity-85" onClick={(event) => event.stopPropagation()}>
+                                <summary className="cursor-pointer select-none font-medium">Nguồn: {row.sourceIds.join(', ')}</summary>
                                 {Array.isArray(row.atomIds) && row.atomIds.length ? <div>Atom: {row.atomIds.join(', ')}</div> : null}
-                                {row.sourceText ? <div className="mt-1 whitespace-normal">{row.sourceText}</div> : null}
-                                {row.errorMsg ? <div className="mt-1 text-red-300">{row.errorMsg}</div> : null}
+                                {row.sourceText ? <div className="mt-1 whitespace-normal text-slate-300">{row.sourceText}</div> : null}
+                                {row.errorMsg ? <div className="mt-1 text-rose-400 font-medium">{row.errorMsg}</div> : null}
                               </details>
                             ) : null}
                           </div>
@@ -8253,10 +8332,21 @@ export default function WorkflowStudio() {
               </div>
             </section>
 
-            <aside className="grid min-h-0 grid-rows-[minmax(0,1fr)_188px] gap-2.5">
-              <div className="min-h-0 overflow-auto rounded-[8px] border border-[#20385f] bg-[#0b1528] p-2.5 shadow-[0_18px_50px_rgba(0,0,0,0.16)]">
-                <h2 className="mb-2 py-1 text-center text-[15px] font-black text-[#f1cc00]">CẤU HÌNH XỬ LÝ</h2>
-                <div className="grid gap-2">
+            <aside className="grid min-h-0 grid-rows-[minmax(0,1fr)_188px] gap-3">
+              <div className="min-h-0 overflow-auto rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-2xl shadow-black/40 backdrop-blur-md">
+                <h2 className="mb-3 py-1 text-center text-xs font-bold uppercase tracking-wider text-indigo-400">CẤU HÌNH XỬ LÝ</h2>
+                <div className="grid gap-2.5">
+
+                  <Panel title="Cấu hình & Keys (Import / Export)">
+                    <div className="grid gap-2">
+                      <Button tone="blue" className="w-full justify-center gap-2" onClick={exportEnvConfig}>
+                        <Download className="h-4 w-4" /> Trích xuất Config & Keys (.json)
+                      </Button>
+                      <Button tone="green" className="w-full justify-center gap-2" onClick={() => envFileInputRef.current?.click()}>
+                        <Upload className="h-4 w-4" /> Nhập Config & Keys (.json)
+                      </Button>
+                    </div>
+                  </Panel>
 
                   <Panel title="Che phụ đề gốc">
                     <Toggle
@@ -10241,9 +10331,9 @@ export default function WorkflowStudio() {
 
             {bulkEditMode === 'ttsRepair' ? (
               <>
-                <div className="max-h-[62vh] overflow-auto rounded border border-[#263a5d] bg-[#0b1426] text-xs">
+                <div className="max-h-[62vh] overflow-auto rounded-xl border border-slate-800 bg-slate-900/80 text-xs backdrop-blur-md">
                   <div
-                    className="sticky top-0 z-10 grid w-max min-w-full border-b border-[#263a5d] bg-[#0d1729] text-center font-black text-[#f1cc00]"
+                    className="sticky top-0 z-10 grid w-max min-w-full border-b border-slate-800 bg-slate-900 text-center font-bold text-indigo-300"
                     style={{ gridTemplateColumns: ttsRepairTableGridTemplate }}
                   >
                     {[
@@ -10255,13 +10345,13 @@ export default function WorkflowStudio() {
                       ['repair', 'Bản sửa'],
                       ['error', 'Lỗi'],
                     ].map(([column, label], index) => (
-                      <div key={column} className={`relative py-2 ${index < 6 ? 'border-r border-[#263a5d]' : ''}`}>
+                      <div key={column} className={`relative py-2.5 ${index < 6 ? 'border-r border-slate-800' : ''}`}>
                         {label}
                         <button
                           type="button"
                           aria-label={`Kéo đổi cột ${label}`}
                           onPointerDown={(event) => startTtsRepairColumnResize(event, column)}
-                          className="absolute right-[-4px] top-0 h-full w-2 cursor-col-resize touch-none bg-transparent hover:bg-[#f1cc00]/50"
+                          className="absolute right-[-4px] top-0 h-full w-2 cursor-col-resize touch-none bg-transparent hover:bg-indigo-500/40"
                         />
                       </div>
                     ))}
@@ -10271,12 +10361,12 @@ export default function WorkflowStudio() {
                     const selected = String(item.rowId) === String(selectedTtsRepairItem?.rowId);
                     const repairStale = isStaleTtsRepairItem(item);
                     const rowTone = selected
-                      ? 'bg-[#172548] text-white ring-1 ring-[#f1cc00]/50'
+                      ? 'bg-indigo-600/30 text-white ring-1 ring-indigo-400'
                       : item.status === 'passed'
-                        ? 'bg-emerald-500/12 text-emerald-50 hover:bg-emerald-500/18'
+                        ? 'bg-emerald-500/10 text-emerald-100 hover:bg-emerald-500/20'
                         : item.status === 'failed'
-                          ? 'bg-red-950/80 text-red-50 hover:bg-red-900/90'
-                          : 'bg-[#0c1629] text-white hover:bg-[#10213b]';
+                          ? 'bg-rose-950/40 text-rose-100 hover:bg-rose-900/40'
+                          : 'bg-slate-900/40 text-slate-100 hover:bg-slate-800/50';
                     const statusText = repairStale
                       ? 'Cũ - dịch lại'
                       : item.status === 'passed'
@@ -10301,12 +10391,12 @@ export default function WorkflowStudio() {
                           ? 'Khớp'
                           : '';
                     const previewStatusTone = previewStatus === 'overflow'
-                      ? 'bg-red-500 text-white'
+                      ? 'bg-rose-600 text-white'
                       : previewStatus === 'slack'
-                        ? 'bg-emerald-500 text-black'
+                        ? 'bg-emerald-500 text-slate-950 font-bold'
                         : previewStatus === 'fit'
-                          ? 'bg-sky-500 text-black'
-                          : 'bg-slate-700 text-white';
+                          ? 'bg-indigo-500 text-white font-bold'
+                          : 'bg-slate-700 text-slate-200';
                     const textOverflowSeconds = Math.max(
                       0,
                       Number(item.overflowSeconds ?? item.overflow_seconds) || 0,
@@ -10343,10 +10433,10 @@ export default function WorkflowStudio() {
                           }
                         }}
                         title={`${item.error_reason || item.reason || 'TTS'} · ${statusText}`}
-                        className={`grid min-h-[72px] w-max min-w-full cursor-pointer border-b border-[#162949] text-left ${rowTone}`}
+                        className={`grid min-h-[72px] w-max min-w-full cursor-pointer border-b border-slate-800 text-left ${rowTone}`}
                         style={{ gridTemplateColumns: ttsRepairTableGridTemplate }}
                       >
-                        <div className="flex items-center justify-center border-r border-[#263a5d] px-2 py-2 text-center">
+                        <div className="flex items-center justify-center border-r border-slate-800 px-2 py-2 text-center">
                           <input
                             type="checkbox"
                             checked={item.applySelected === true}
@@ -10358,64 +10448,64 @@ export default function WorkflowStudio() {
                             disabled={!repairedText}
                             onClick={(event) => event.stopPropagation()}
                             onChange={(event) => toggleTtsRepairApplyRow(item.rowId, event.target.checked)}
-                            className="h-4 w-4 accent-[#22c55e]"
+                            className="h-4 w-4 accent-emerald-500"
                           />
                         </div>
-                        <div className="border-r border-[#263a5d] px-2 py-2 text-center font-mono">{row?.index || item.rowId}</div>
-                        <div className="border-r border-[#263a5d] px-2 py-2 font-mono">{row ? formatSrtTime(row.start).replace(',', '.') : '-'}</div>
-                        <div className="border-r border-[#263a5d] px-2 py-2 font-mono">{row ? formatSrtTime(row.end).replace(',', '.') : '-'}</div>
-                        <div className="min-w-0 border-r border-[#263a5d] px-2 py-1.5 leading-5">
+                        <div className="border-r border-slate-800 px-2 py-2 text-center font-mono">{row?.index || item.rowId}</div>
+                        <div className="border-r border-slate-800 px-2 py-2 font-mono">{row ? formatSrtTime(row.start).replace(',', '.') : '-'}</div>
+                        <div className="border-r border-slate-800 px-2 py-2 font-mono">{row ? formatSrtTime(row.end).replace(',', '.') : '-'}</div>
+                        <div className="min-w-0 border-r border-slate-800 px-2 py-1.5 leading-5">
                           {textTimingBadge ? (
                             <div className="mb-1 flex flex-wrap gap-1">
                               <span
-                                className={`rounded px-1.5 py-0.5 text-[10px] font-black ${textTimingBadge.tone === 'red' ? 'bg-red-500 text-white' : 'bg-amber-500 text-black'}`}
+                                className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${textTimingBadge.tone === 'red' ? 'bg-rose-500 text-white' : 'bg-amber-500 text-slate-950'}`}
                               >
                                 {textTimingBadge.label} {formatSecondsShort(textTimingBadge.seconds)}
                               </span>
                             </div>
                           ) : null}
-                          <div className="max-h-[116px] overflow-auto whitespace-pre-wrap break-words text-sm font-semibold leading-5">
+                          <div className="max-h-[116px] overflow-auto whitespace-pre-wrap break-words text-sm font-semibold leading-5 text-slate-100">
                             {originalText}
                           </div>
                           {sourceContextText ? (
-                            <div className="mt-1 max-h-[72px] overflow-auto whitespace-pre-wrap break-words border-t border-white/10 pt-1 text-[11px] leading-4 text-slate-300">
-                              <span className="font-bold text-slate-400">STT gốc: </span>{sourceContextText}
+                            <div className="mt-1 max-h-[72px] overflow-auto whitespace-pre-wrap break-words border-t border-slate-800 pt-1 text-[11px] leading-4 text-slate-400">
+                              <span className="font-bold text-slate-300">STT gốc: </span>{sourceContextText}
                             </div>
                           ) : null}
                         </div>
-                        <div className="min-w-0 border-r border-[#263a5d] px-2 py-1.5">
+                        <div className="min-w-0 border-r border-slate-800 px-2 py-1.5">
                           <textarea
                             value={repairedText}
                             placeholder="Bấm Dịch dòng này hoặc nhập bản sửa..."
                             onClick={(event) => event.stopPropagation()}
                             onChange={(event) => updateTtsRepairDraft(item.rowId, event.target.value)}
-                            className="min-h-[58px] max-h-[150px] w-full resize-y rounded border border-[#28436d] bg-[#071020] px-2 py-1.5 text-sm leading-5 text-white outline-none focus:border-[#f1cc00]"
+                            className="min-h-[58px] max-h-[150px] w-full resize-y rounded-lg border border-slate-800 bg-slate-950/80 px-2.5 py-2 text-sm leading-5 text-slate-100 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                           />
                         </div>
                         <div className="min-w-0 px-2 py-1.5 text-[10px] font-bold leading-4">
                           <div className="flex flex-wrap items-start gap-1">
-                            <span className={`rounded px-1.5 py-0.5 ${item.severity === 'major' ? 'bg-red-500 text-white' : item.severity === 'minor' ? 'bg-amber-500/90 text-black' : 'bg-slate-700 text-white'}`}>
+                            <span className={`rounded-md px-1.5 py-0.5 ${item.severity === 'major' ? 'bg-rose-600 text-white' : item.severity === 'minor' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300'}`}>
                               {item.severity === 'major' ? '>=1s' : item.severity === 'minor' ? '<1s' : statusText}
                             </span>
-                            <span className={item.status === 'passed' ? 'text-emerald-300' : item.status === 'failed' ? 'text-red-300' : 'text-slate-400'}>
+                            <span className={item.status === 'passed' ? 'text-emerald-300' : item.status === 'failed' ? 'text-rose-300' : 'text-slate-400'}>
                               {statusText}
                             </span>
                             {previewStatusLabel ? (
-                              <span className={`rounded px-1.5 py-0.5 ${previewStatusTone}`}>
+                              <span className={`rounded-md px-1.5 py-0.5 ${previewStatusTone}`}>
                                 {previewStatusLabel}
                               </span>
                             ) : null}
                             {repairStale ? (
-                              <span className="rounded bg-amber-400 px-1.5 py-0.5 text-black">
+                              <span className="rounded-md bg-amber-500 px-1.5 py-0.5 text-slate-950">
                                 Bản cũ
                               </span>
                             ) : null}
                           </div>
                           {displayedErrorReason ? (
-                            <div className="mt-1 whitespace-normal break-words text-red-100">{displayedErrorReason}</div>
+                            <div className="mt-1 whitespace-normal break-words text-rose-300">{displayedErrorReason}</div>
                           ) : null}
                           {previewStatusLabel ? (
-                            <div className="mt-1 whitespace-normal break-words text-slate-300">
+                            <div className="mt-1 whitespace-normal break-words text-slate-400 font-mono">
                               Slot {formatSecondsShort(item.ttsPreviewSlotSeconds)} · Audio {formatSecondsShort(item.ttsPreviewAudioSeconds)}
                             </div>
                           ) : null}
@@ -10443,17 +10533,17 @@ export default function WorkflowStudio() {
                       </div>
                     );
                   }) : (
-                    <div className="flex h-32 items-center justify-center text-slate-500">Chưa có dòng cần chỉnh sửa trong bộ lọc này.</div>
+                    <div className="flex h-32 items-center justify-center text-slate-400">Chưa có dòng cần chỉnh sửa trong bộ lọc này.</div>
                   )}
                 </div>
               </>
             ) : (
               <>
-                <div className="grid max-h-[58vh] overflow-hidden rounded border border-[#263a5d] bg-[#0b1426] text-xs">
-                  <div className="grid grid-cols-[44px_118px_118px_1fr] border-b border-[#263a5d] bg-[#0d1729] text-center font-black text-[#f1cc00]">
-                    <div className="border-r border-[#263a5d] py-2">#</div>
-                    <div className="border-r border-[#263a5d] py-2">Start</div>
-                    <div className="border-r border-[#263a5d] py-2">End</div>
+                <div className="grid max-h-[58vh] overflow-hidden rounded-xl border border-slate-800 bg-slate-900/80 text-xs backdrop-blur-md">
+                  <div className="grid grid-cols-[44px_118px_118px_1fr] border-b border-slate-800 bg-slate-900 text-center font-bold text-indigo-300">
+                    <div className="border-r border-slate-800 py-2">#</div>
+                    <div className="border-r border-slate-800 py-2">Start</div>
+                    <div className="border-r border-slate-800 py-2">End</div>
                     <div className="py-2">Text</div>
                   </div>
                   <div className="max-h-[48vh] overflow-auto">
@@ -10465,17 +10555,17 @@ export default function WorkflowStudio() {
                         <div
                           key={row.id}
                           onClick={() => selectBulkEditRow(row)}
-                          className={`grid min-h-[48px] w-full grid-cols-[44px_118px_118px_1fr] border-b border-[#162949] text-left ${selected ? 'bg-[#f1cc00] text-black' : 'bg-[#0c1629] text-white hover:bg-[#10213b]'}`}
+                          className={`grid min-h-[48px] w-full grid-cols-[44px_118px_118px_1fr] border-b border-slate-800 text-left transition-colors ${selected ? 'bg-indigo-600/30 text-white ring-1 ring-indigo-500' : 'bg-slate-900/40 text-slate-100 hover:bg-slate-800/50'}`}
                         >
-                          <div className="border-r border-[#263a5d] px-2 py-2 text-center font-mono">{row.index}</div>
-                          <div className="border-r border-[#263a5d] px-2 py-2 font-mono">{formatSrtTime(row.start).replace(',', '.')}</div>
-                          <div className="border-r border-[#263a5d] px-2 py-2 font-mono">{formatSrtTime(row.end).replace(',', '.')}</div>
+                          <div className="border-r border-slate-800 px-2 py-2 text-center font-mono text-slate-400">{row.index}</div>
+                          <div className="border-r border-slate-800 px-2 py-2 font-mono text-slate-300">{formatSrtTime(row.start).replace(',', '.')}</div>
+                          <div className="border-r border-slate-800 px-2 py-2 font-mono text-slate-300">{formatSrtTime(row.end).replace(',', '.')}</div>
                           <div className="px-2 py-1.5">
                             <textarea
                               value={text}
                               onClick={(event) => event.stopPropagation()}
                               onChange={(event) => updateBulkEditLine(row, event.target.value)}
-                              className={`min-h-[36px] max-h-[110px] w-full resize-y rounded border px-2 py-1.5 text-sm leading-5 outline-none ${selected ? 'border-black/25 bg-black/10 text-black placeholder-black/50 focus:border-black' : 'border-[#28436d] bg-[#071020] text-white focus:border-[#f1cc00]'}`}
+                              className={`min-h-[36px] max-h-[110px] w-full resize-y rounded-lg border px-2.5 py-1.5 text-sm leading-5 outline-none transition-all ${selected ? 'border-indigo-500 bg-slate-950 text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/20' : 'border-slate-800 bg-slate-950/80 text-slate-100 focus:border-indigo-500'}`}
                               placeholder="Nhập text phụ đề..."
                             />
                           </div>
@@ -10500,11 +10590,11 @@ export default function WorkflowStudio() {
               </div>
             )}
           >
-            <div className="grid max-h-[58vh] overflow-hidden rounded border border-[#263a5d] bg-[#0b1426] text-xs">
-              <div className="grid grid-cols-[44px_118px_118px_1fr] border-b border-[#263a5d] bg-[#0d1729] text-center font-black text-[#f1cc00]">
-                <div className="border-r border-[#263a5d] py-2">#</div>
-                <div className="border-r border-[#263a5d] py-2">Start</div>
-                <div className="border-r border-[#263a5d] py-2">End</div>
+            <div className="grid max-h-[58vh] overflow-hidden rounded-xl border border-slate-800 bg-slate-900/80 text-xs backdrop-blur-md">
+              <div className="grid grid-cols-[44px_118px_118px_1fr] border-b border-slate-800 bg-slate-900 text-center font-bold text-indigo-300">
+                <div className="border-r border-slate-800 py-2">#</div>
+                <div className="border-r border-slate-800 py-2">Start</div>
+                <div className="border-r border-slate-800 py-2">End</div>
                 <div className="py-2">Text</div>
               </div>
               <div className="max-h-[48vh] overflow-auto">

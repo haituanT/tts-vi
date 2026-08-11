@@ -111,17 +111,17 @@ const VIETNAMESE_CLASSIC_VOICE_GUIDANCE = {
 
 function Button({ tone = 'dark', className = '', disabled, children, ...props }) {
   const tones = {
-    dark: 'bg-[#111c2f] text-white hover:bg-[#192a45]',
-    blue: 'bg-[#4389ee] text-white hover:bg-[#5a9bff]',
-    green: 'bg-[#16c970] text-white hover:bg-[#20df82]',
-    red: 'bg-[#ef4444] text-black hover:bg-[#fb5555]',
-    yellow: 'bg-[#f1cc00] text-black hover:bg-[#ffdf19]',
+    dark: 'bg-slate-800/90 text-slate-200 hover:bg-slate-700/90 hover:text-white border border-slate-700/60',
+    blue: 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-900/20',
+    green: 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-900/20',
+    red: 'bg-rose-600 text-white hover:bg-rose-500 shadow-rose-900/20',
+    yellow: 'bg-amber-500 text-slate-950 font-bold hover:bg-amber-400 shadow-amber-900/20',
   };
   return (
     <button
       type="button"
       disabled={disabled}
-      className={`inline-flex h-9 items-center justify-center gap-2 rounded-[6px] px-3 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-45 ${tones[tone]} ${className}`}
+      className={`inline-flex h-9 items-center justify-center gap-2 rounded-lg px-3.5 text-xs font-semibold tracking-tight shadow-md transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${tones[tone] || tones.dark} ${className}`}
       {...props}
     >
       {children}
@@ -131,19 +131,19 @@ function Button({ tone = 'dark', className = '', disabled, children, ...props })
 
 function Field({ label, children }) {
   return (
-    <label className="grid gap-1.5 text-xs text-slate-300">
-      <span className="font-semibold">{label}</span>
+    <label className="grid gap-1.5 text-xs text-slate-200">
+      <span className="font-semibold text-slate-300 tracking-tight">{label}</span>
       {children}
     </label>
   );
 }
 
 function Input(props) {
-  return <input {...props} className={`h-9 w-full rounded border border-[#263a5d] bg-[#0b1426] px-2.5 text-xs text-white outline-none focus:border-[#f1cc00] ${props.className || ''}`} />;
+  return <input {...props} className={`h-9 w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 text-xs text-slate-100 placeholder-slate-500 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 ${props.className || ''}`} />;
 }
 
 function Select(props) {
-  return <select {...props} className={`h-9 w-full rounded border border-[#263a5d] bg-[#0b1426] px-2.5 text-xs text-white outline-none focus:border-[#f1cc00] ${props.className || ''}`} />;
+  return <select {...props} className={`h-9 w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 text-xs text-slate-100 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 ${props.className || ''}`} />;
 }
 
 function inferVoiceGender(voiceName = '') {
