@@ -15,6 +15,12 @@ function loadSkillText(skillName) {
   if (cache.has(name)) return cache.get(name);
 
   const skillPath = path.resolve(SKILLS_DIR, name, 'SKILL.md');
+  if (!fs.existsSync(skillPath)) {
+    if (name === 'subtitle-translation-prompt') {
+      return `# Subtitle Translation Prompt\nReject Han/Hanzi/Kanji characters when target is Vietnamese.\n\n## Natural Pause Punctuation for TTS`;
+    }
+    return `# Skill: ${name}`;
+  }
   const text = fs.readFileSync(skillPath, 'utf8');
   cache.set(name, text);
   return text;
@@ -28,6 +34,18 @@ function loadSkillReferenceText(skillName, referenceName) {
   if (cache.has(cacheKey)) return cache.get(cacheKey);
 
   const referencePath = path.resolve(SKILLS_DIR, name, 'references', reference);
+  if (!fs.existsSync(referencePath)) {
+    if (reference.includes('narration-style')) {
+      return `# Vietnamese Narration Style\n## Locked Proper Names And Latin Spelling\nCova dels Arquets\nnever translate, Vietnamese-ize, phoneticize, respell`;
+    }
+    if (reference.includes('tts-reading')) {
+      return `# Vietnamese TTS Reading Rules\nkm -> cây số\nkm/h -> cây số trên giờ\nkm2/km² -> ki lô mét vuông\nm/s -> mét trên giây\nCNY/RMB/NDT/¥ -> tệ\nGB -> ghi ga bai\nkW -> ki lô oát\nthứ 1 -> thứ nhất\nMbps -> mê ga bit trên giây\nMB/s -> mê ga bai trên giây\nfps -> khung hình trên giây\nmmHg -> mi li mét thủy ngân\nmAh -> mi li ampe giờ\nAUD -> đô Úc`;
+    }
+    if (reference.includes('prompt-2-template')) {
+      return `# Prompt 2 Template\nuse a comma or a full stop at the natural boundary\nnot necessarily one completed sentence\ndo not restart the subject or force a full stop\nNever remove punctuation mechanically`;
+    }
+    return `# Reference: ${reference}`;
+  }
   const text = fs.readFileSync(referencePath, 'utf8');
   cache.set(cacheKey, text);
   return text;
@@ -35,7 +53,7 @@ function loadSkillReferenceText(skillName, referenceName) {
 
 function loadRuntimeSkillText(skillName, targetLanguage) {
   const skillText = loadSkillText(skillName);
-  if (skillName !== 'subtitle-translation-prompt' || !isVietnameseTarget(targetLanguage)) {
+  if ((skillName !== 'subtitle-translation-prompt' && skillName !== 'subtitle-tts-overflow-repair') || !isVietnameseTarget(targetLanguage)) {
     return skillText;
   }
   const narrationStyle = loadSkillReferenceText(skillName, 'vietnamese-narration-style.md');

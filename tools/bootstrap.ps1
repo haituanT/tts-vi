@@ -91,8 +91,13 @@ function Invoke-NpmInstall([string]$Directory, [string]$Label, [string]$ProbePac
 function Test-PythonExecutable([string]$Path) {
   if (-not $Path -or -not (Test-Path -LiteralPath $Path)) { return $false }
   try {
-    & $Path --version *> $null
-    return $LASTEXITCODE -eq 0
+    $verStr = (& $Path -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')" 2>$null | Select-Object -Last 1).Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $verStr) { return $false }
+    $parts = $verStr.Split('.')
+    $major = [int]$parts[0]
+    $minor = [int]$parts[1]
+    # DubFlow dependencies (rapidocr-onnxruntime, onnxruntime) require Python >= 3.8 and <= 3.12
+    return ($major -eq 3 -and $minor -ge 8 -and $minor -le 12)
   } catch {
     return $false
   }
@@ -104,18 +109,20 @@ function Resolve-Python {
     return $bundled
   }
 
+  $pyLauncher = Command-Path 'py.exe'
+  if ($pyLauncher) {
+    foreach ($verSpec in @('-3.11', '-3.10', '-3.12')) {
+      $resolved = (& $pyLauncher $verSpec -c 'import sys; print(sys.executable)' 2>$null | Select-Object -Last 1).Trim()
+      if (Test-PythonExecutable $resolved) {
+        return $resolved
+      }
+    }
+  }
+
   Refresh-ProcessPath
   $system = Command-Path 'python.exe'
   if (Test-PythonExecutable $system) {
     return $system
-  }
-
-  $pyLauncher = Command-Path 'py.exe'
-  if ($pyLauncher) {
-    $resolved = (& $pyLauncher -3.11 -c 'import sys; print(sys.executable)' 2>$null | Select-Object -Last 1).Trim()
-    if (Test-PythonExecutable $resolved) {
-      return $resolved
-    }
   }
 
   Invoke-WingetInstall 'Python.Python.3.11'
@@ -125,7 +132,6 @@ function Resolve-Python {
     return $system
   }
 
-  $pyLauncher = Command-Path 'py.exe'
   if ($pyLauncher) {
     $resolved = (& $pyLauncher -3.11 -c 'import sys; print(sys.executable)' 2>$null | Select-Object -Last 1).Trim()
     if (Test-PythonExecutable $resolved) {
@@ -152,6 +158,12 @@ function Find-YtDlpExecutable([string]$PythonPath) {
   $candidates += Join-Path $pythonDir 'Scripts\yt-dlp.exe'
   $scriptsPath = (& $PythonPath -c "import sysconfig; print(sysconfig.get_path('scripts'))" 2>$null | Select-Object -Last 1).Trim()
   if ($scriptsPath) { $candidates += Join-Path $scriptsPath 'yt-dlp.exe' }
+
+  $userScripts = (& $PythonPath -c "import site, os; print(os.path.join(site.getuserbase(), 'Scripts'))" 2>$null | Select-Object -Last 1).Trim()
+  if ($userScripts) { $candidates += Join-Path $userScripts 'yt-dlp.exe' }
+
+  $userPyScripts = (& $PythonPath -c "import site, os, sys; print(os.path.join(site.getuserbase(), f'Python{sys.version_info.major}{sys.version_info.minor}', 'Scripts'))" 2>$null | Select-Object -Last 1).Trim()
+  if ($userPyScripts) { $candidates += Join-Path $userPyScripts 'yt-dlp.exe' }
 
   foreach ($candidate in $candidates) {
     if ($candidate -and (Test-Path -LiteralPath $candidate)) {
