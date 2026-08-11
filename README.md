@@ -198,14 +198,14 @@ Installer/winget must be available for that automatic runtime installation.
 ### Backend
 
 ```powershell
-cd "C:\Users\Van Tuan\DubFlow\Backend"
+cd Backend
 npm install
 ```
 
 ### Frontend
 
 ```powershell
-cd "C:\Users\Van Tuan\DubFlow\Frontend"
+cd Frontend
 npm install
 ```
 
@@ -218,7 +218,7 @@ The commands above are manual alternatives to the one-click setup.
 This is the easiest mode while the app is still local and Windows-first. It starts the backend, starts the Next.js UI, then opens DubFlow in a desktop window.
 
 ```powershell
-cd "D:\ai soure\DubFlow\Frontend"
+cd Frontend
 npm run app
 ```
 
@@ -227,14 +227,14 @@ Close the DubFlow window to stop the local app runner.
 ### Backend
 
 ```powershell
-cd "C:\Users\Van Tuan\DubFlow\Backend"
+cd Backend
 node server.js
 ```
 
 ### Frontend
 
 ```powershell
-cd "C:\Users\Van Tuan\DubFlow\Frontend"
+cd Frontend
 npm run dev
 ```
 
@@ -286,7 +286,7 @@ Message:
 Fix:
 
 ```powershell
-cd "C:\Users\Van Tuan\DubFlow\Backend"
+cd Backend
 node server.js
 ```
 

@@ -10,7 +10,17 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    ignores: [
+      ".next/**",
+      ".chrome-subedit-*/**",
+      ".dubflow/**",
+      "test-results/**",
+      "playwright-report/**",
+      "blob-report/**",
+    ],
+  },
+  ...compat.extends("next/core-web-vitals"),
 ];
 
 export default eslintConfig;

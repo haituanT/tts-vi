@@ -2,12 +2,12 @@ const { test, expect } = require('@playwright/test');
 
 test.use({
   launchOptions: {
-    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    channel: 'chrome',
   },
   viewport: { width: 1440, height: 950 },
 });
 
-test('sub editor opens and applies row edits', async ({ page }) => {
+test('sub editor opens and applies row edits', async ({ page }, testInfo) => {
   const consoleErrors = [];
   const pageErrors = [];
 
@@ -51,7 +51,7 @@ test('sub editor opens and applies row edits', async ({ page }) => {
 
   await expect(page.getByText('Nội dung đã sửa từ Sub Editor')).toBeVisible();
   await expect(page.getByText('Replace All')).toBeVisible();
-  await page.screenshot({ path: 'D:/ai soure/DubFlow/Frontend/sub-editor-check.png', fullPage: true });
+  await page.screenshot({ path: testInfo.outputPath('sub-editor-check.png'), fullPage: true });
 
   const row = await page.evaluate(() => JSON.parse(localStorage.getItem('dubflow.reupStudio.v5')).rows.find((item) => item.id === 'row-2'));
   expect(row.finalText).toBe('Nội dung đã sửa từ Sub Editor');

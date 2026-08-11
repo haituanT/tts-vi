@@ -722,13 +722,13 @@ function defaultSttPatchForProvider(provider) {
   return patch;
 }
 
-function useSubtitleCueGrouping(config = {}) {
+function isSubtitleCueGroupingEnabled(config = {}) {
   return config.subtitleGroupSettingsVersion === 1 && config.subtitleGroupEnabled === true;
 }
 
-function useSourceResegment(config = {}) {
+function shouldUseSourceResegment(config = {}) {
   return config.sttProvider !== 'assemblyai_speech_to_text'
-    && !useSubtitleCueGrouping(config)
+    && !isSubtitleCueGroupingEnabled(config)
     && config.nlpSourceResegment !== false;
 }
 
@@ -1995,9 +1995,9 @@ function savedSettingsFromConfig(config = {}) {
     sttProvider,
     sttModel: STT_MODELS[sttProvider]?.includes(config.sttModel) ? config.sttModel : getDefaultSttModel(sttProvider),
     sttTimestampMode: config.sttTimestampMode || DEFAULT_STATE.config.sttTimestampMode,
-    nlpSourceResegment: useSourceResegment(config),
+    nlpSourceResegment: shouldUseSourceResegment(config),
     subtitleGroupSettingsVersion: 1,
-    subtitleGroupEnabled: useSubtitleCueGrouping(config),
+    subtitleGroupEnabled: isSubtitleCueGroupingEnabled(config),
     subtitleGroupLanguage: config.subtitleGroupLanguage || DEFAULT_STATE.config.subtitleGroupLanguage,
     subtitleGroupBatchSize: Number(config.subtitleGroupBatchSize ?? DEFAULT_STATE.config.subtitleGroupBatchSize),
     subtitleGroupConcurrency: Number(config.subtitleGroupConcurrency ?? DEFAULT_STATE.config.subtitleGroupConcurrency),
@@ -4187,9 +4187,9 @@ export default function WorkflowStudio() {
     sttProvider: config.sttProvider,
     sttModel: config.sttModel,
     sttTimestampMode: config.sttTimestampMode,
-    nlpSourceResegment: useSourceResegment(config),
+    nlpSourceResegment: shouldUseSourceResegment(config),
     subtitleGroupSettingsVersion: 1,
-    subtitleGroupEnabled: useSubtitleCueGrouping(config),
+    subtitleGroupEnabled: isSubtitleCueGroupingEnabled(config),
     subtitleGroupLanguage: config.subtitleGroupLanguage || DEFAULT_STATE.config.subtitleGroupLanguage,
     subtitleGroupBatchSize: Number(config.subtitleGroupBatchSize ?? DEFAULT_STATE.config.subtitleGroupBatchSize),
     subtitleGroupConcurrency: Number(config.subtitleGroupConcurrency ?? DEFAULT_STATE.config.subtitleGroupConcurrency),
@@ -4969,12 +4969,12 @@ export default function WorkflowStudio() {
       sttProvider: config.sttProvider,
       sttModel: config.sttModel,
       sttTimestampMode: config.sttTimestampMode,
-      nlpSourceResegment: useSourceResegment(config),
+      nlpSourceResegment: shouldUseSourceResegment(config),
       userHint: '',
       googleCloudConfig: googleCloudConfig(),
     });
     let sourceData = data;
-    if (useSubtitleCueGrouping(config)) {
+    if (isSubtitleCueGroupingEnabled(config)) {
       addLog('AI gộp cụm ý: đang tạo template group từ STT thô.');
       const grouped = await callApi('/api/manual/subtitle-template-groups', {
         jobId,
@@ -5040,7 +5040,7 @@ export default function WorkflowStudio() {
         addLog('Provider không trả word timestamps, đã fallback về Word timestamps.');
       }
     }
-    if (useSubtitleCueGrouping(config)) {
+    if (isSubtitleCueGroupingEnabled(config)) {
       setSubtitleToolTab('translate');
       setActiveModal('subtitleTools');
     }
@@ -7893,7 +7893,7 @@ export default function WorkflowStudio() {
                       {dubbedAudioSrc ? <audio ref={dubbedAudioRef} src={dubbedAudioSrc} preload="auto" /> : null}
                     </>
                   ) : (
-                    <div className="text-[14px] text-slate-500">Ấn vào "Thêm" hoặc kéo thả video và voice trực tiếp vào đây</div>
+                    <div className="text-[14px] text-slate-500">Ấn vào &quot;Thêm&quot; hoặc kéo thả video và voice trực tiếp vào đây</div>
                   )}
                 </div>
 
@@ -8859,7 +8859,7 @@ export default function WorkflowStudio() {
                 <label className="flex cursor-pointer items-start gap-3 rounded border border-[#263a5d] bg-[#0b1426] px-3 py-2 text-sm text-slate-200">
                   <input
                     type="checkbox"
-                    checked={useSubtitleCueGrouping(config)}
+                    checked={isSubtitleCueGroupingEnabled(config)}
                     onChange={(event) => patchConfig({ subtitleGroupSettingsVersion: 1, subtitleGroupEnabled: event.target.checked })}
                     className="mt-0.5 accent-[#f1cc00]"
                   />
@@ -8896,7 +8896,7 @@ export default function WorkflowStudio() {
                 </Select>
               </Field>
             </div>
-            {sttToolTab === 'stt' && useSubtitleCueGrouping(config) ? (
+            {sttToolTab === 'stt' && isSubtitleCueGroupingEnabled(config) ? (
             <div className="grid gap-3 rounded border border-[#263a5d] bg-[#0b1426] p-3 text-sm text-slate-200">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Provider AI gộp">
