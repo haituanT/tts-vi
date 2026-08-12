@@ -245,6 +245,56 @@ async function probeCli(command) {
   }
 }
 
+function isCliAvailableSync(provider) {
+  const normalized = String(provider || '').trim().toLowerCase();
+  if (!isCliTranslationProvider(normalized)) return false;
+  const command = cliProviderCommand(normalized);
+  if (!command) return false;
+  const spec = resolveCliCommand(command);
+  if (!spec || !spec.command) return false;
+  if (spec.command === 'cmd.exe') {
+    const cmdPath = spec.prefixArgs?.[4];
+    return Boolean(cmdPath && fs.existsSync(cmdPath));
+  }
+  if (spec.command && spec.command !== command) {
+    return fs.existsSync(spec.command);
+  }
+  return false;
+}
+
+async function resolveAvailableCliProvider(requestedProvider) {
+  const normalized = String(requestedProvider || '').trim().toLowerCase();
+  const target = isCliTranslationProvider(normalized) ? normalized : 'codex_cli';
+
+  if (await probeCli(cliProviderCommand(target))) {
+    return target;
+  }
+
+  for (const candidate of CLI_PROVIDERS) {
+    if (candidate !== target && await probeCli(cliProviderCommand(candidate))) {
+      console.log(`[cliTranslationService] Requested CLI provider '${target}' is not available on this machine. Falling back to available CLI provider '${candidate}'.`);
+      return candidate;
+    }
+  }
+
+  return target;
+}
+
+function filterCompatibleCliModel(provider, model) {
+  const m = String(model || '').trim();
+  if (!m) return '';
+  const isCodexModel = /^gpt-|^codex|^o[13]/i.test(m);
+  const isAntigravityModel = /^gemini|^claude|^flash|^pro/i.test(m);
+
+  if (provider === 'antigravity_cli' && isCodexModel) {
+    return '';
+  }
+  if (provider === 'codex_cli' && isAntigravityModel) {
+    return '';
+  }
+  return m;
+}
+
 async function getCliTranslationProviderStatus(provider) {
   const normalized = String(provider || '').trim().toLowerCase();
   if (!isCliTranslationProvider(normalized)) {
@@ -253,14 +303,23 @@ async function getCliTranslationProviderStatus(provider) {
 
   const command = cliProviderCommand(normalized);
   const spec = resolveCliCommand(command);
-  const available = await probeCli(command);
+  const directAvailable = await probeCli(command);
   let version = '';
-  if (available) {
+  let fallbackProvider = null;
+
+  if (directAvailable) {
     try {
       const result = await runProcess(spec, ['--version'], { timeoutMs: CLI_PROBE_TIMEOUT_MS });
       version = truncate(result.stdout || result.stderr || '', 200);
     } catch {
       version = '';
+    }
+  } else {
+    for (const candidate of CLI_PROVIDERS) {
+      if (candidate !== normalized && await probeCli(cliProviderCommand(candidate))) {
+        fallbackProvider = candidate;
+        break;
+      }
     }
   }
 
@@ -268,7 +327,10 @@ async function getCliTranslationProviderStatus(provider) {
     provider: normalized,
     command,
     commandPath: spec.prefixArgs.length ? spec.prefixArgs[spec.prefixArgs.length - 1] : spec.command,
-    available,
+    available: directAvailable || Boolean(fallbackProvider),
+    directAvailable,
+    fallbackProvider,
+    activeProvider: directAvailable ? normalized : (fallbackProvider || normalized),
     version,
   };
 }
@@ -781,11 +843,13 @@ async function runCliTranslation(provider, {
   timeoutMs = DEFAULT_TIMEOUT_MS,
   model = '',
 } = {}) {
-  switch (String(provider || '').trim().toLowerCase()) {
+  const resolvedProvider = await resolveAvailableCliProvider(provider);
+  const safeModel = filterCompatibleCliModel(resolvedProvider, model);
+  switch (resolvedProvider) {
     case 'codex_cli':
-      return runCodex({ systemPrompt, userPrompt, timeoutMs, model });
+      return runCodex({ systemPrompt, userPrompt, timeoutMs, model: safeModel });
     case 'antigravity_cli':
-      return runAntigravity({ systemPrompt, userPrompt, timeoutMs, model });
+      return runAntigravity({ systemPrompt, userPrompt, timeoutMs, model: safeModel });
     default:
       throw new Error(`Unknown CLI translation provider: ${provider}`);
   }
@@ -793,6 +857,8 @@ async function runCliTranslation(provider, {
 
 module.exports = {
   isCliTranslationProvider,
+  isCliAvailableSync,
+  resolveAvailableCliProvider,
   getCliTranslationProviderStatus,
   runCliTranslation,
   _private: {

@@ -630,6 +630,16 @@ function resolveGoogleCloudConfig(body = {}) {
   const safeTtsProviders = new Set(['edge_tts', 'google_cloud_tts', 'aimax_tts']);
   if (!safeSttProviders.has(config.sttProvider)) config.sttProvider = DEFAULTS.sttProvider;
   if (!safeTranslationProviders.has(config.translationProvider)) config.translationProvider = DEFAULTS.translationProvider;
+  
+  const { isCliAvailableSync } = require('./cliTranslationService');
+  if (!isCliAvailableSync(config.translationProvider)) {
+    if (isCliAvailableSync('antigravity_cli')) {
+      config.translationProvider = 'antigravity_cli';
+    } else if (isCliAvailableSync('codex_cli')) {
+      config.translationProvider = 'codex_cli';
+    }
+  }
+
   if (!safeTtsProviders.has(config.ttsProvider)) config.ttsProvider = DEFAULTS.ttsProvider;
 
   if (
