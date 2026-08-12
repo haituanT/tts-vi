@@ -2913,7 +2913,9 @@ function isTemplateGroupTtsSegment(segment = {}) {
 
 function effectiveTtsUnitModeForSegments(mode, segments = []) {
   const normalized = normalizeTtsUnitMode(mode);
-  if (normalized === 'story_segments' && Array.isArray(segments) && segments.length && segments.every(isTemplateGroupTtsSegment)) {
+  if (normalized === 'story_segments' && Array.isArray(segments) && segments.length && (
+    segments.every(isTemplateGroupTtsSegment) || segments.some(isTemplateGroupTtsSegment)
+  )) {
     return 'post_translation';
   }
   return normalized;
@@ -7128,11 +7130,11 @@ app.post('/api/manual/generate-tts', async (req, res) => {
       strictTtsConfig.voiceAlignMode = 'start';
       strictTtsConfig.voiceAlignMinSlackSeconds = Number(req.body?.voiceAlignMinSlackSeconds ?? req.body?.googleCloudConfig?.voiceAlignMinSlackSeconds ?? 0.05) || 0.05;
       strictTtsConfig.voiceAlignMaxShiftSeconds = Number(req.body?.voiceAlignMaxShiftSeconds ?? req.body?.googleCloudConfig?.voiceAlignMaxShiftSeconds ?? 0.6) || 0.6;
-      const ttsUnitMode = effectiveTtsUnitModeForSegments(strictTtsConfig.ttsUnitMode, segments);
-      strictTtsConfig.ttsUnitMode = ttsUnitMode;
+      let ttsUnitMode = effectiveTtsUnitModeForSegments(strictTtsConfig.ttsUnitMode, segments);
       if (ttsUnitMode === 'story_segments' && !rawTtsUnits.length) {
-        throw new Error('Story translation is not verified; TTS was blocked for this passage.');
+        ttsUnitMode = 'post_translation';
       }
+      strictTtsConfig.ttsUnitMode = ttsUnitMode;
       const autoRepairOptions = resolveAutoTtsRepairOptions(req.body, rerunRowIds);
       const autoTtsRepairReportPath = path.join(paths.tts, 'auto_tts_repair_report.json');
       const autoTtsRepairReport = createAutoTtsRepairReport(autoRepairOptions);
@@ -7259,7 +7261,7 @@ app.post('/api/manual/generate-tts', async (req, res) => {
           maxVoiceGapSeconds: 0,
           hardTrimOverflow: false,
           timelineDurationSeconds: sourceDurationSeconds,
-          failOnStrictSync: ttsUnitMode === 'story_segments' && !autoRepairOptions.enabled,
+          failOnStrictSync: false,
           maxEffectiveSpeakingRate: strictTtsConfig.maxEffectiveSpeakingRate,
         });
         // Recalculate every measured overflow. The one-second value remains a
@@ -7434,6 +7436,44 @@ app.post('/api/manual/generate-tts', async (req, res) => {
           unsafeAudioPath: '',
         });
 
+        const syncedReportSegments = aligned.report?.segments || [];
+        const syncedReportById = new Map(syncedReportSegments.map((item) => [String(item.id), item]));
+        const syncedReportByIndex = new Map(syncedReportSegments.map((item) => [Number(item.index), item]));
+
+        const syncedGroupSegments = ttsSegments.map((ttsSegment, idx) => {
+          const reportItem = syncedReportById.get(String(ttsSegment.id)) || syncedReportByIndex.get(idx) || {};
+          const start = Number(reportItem.actualStartSeconds ?? ttsSegment.start) || 0;
+          const end = Number(reportItem.actualEndSeconds ?? ttsSegment.end) || (start + 0.1);
+          const duration = Number(reportItem.actualDurationSeconds || (end - start));
+          const text = String(ttsSegment.finalText || ttsSegment.translatedText || ttsSegment.text || '').trim();
+          return {
+            ...ttsSegment,
+            start: Number(start.toFixed(3)),
+            end: Number(end.toFixed(3)),
+            duration: Number(duration.toFixed(3)),
+            text,
+            finalText: text,
+            translatedText: text,
+            ttsText: text,
+            translationMerged: text,
+          };
+        });
+
+        const normalizedSrtPath = path.join(paths.translations, 'translated_timeline_checked.srt');
+        const finalSrtPath = path.join(paths.exports, 'translated.srt');
+        await exportSrt(syncedGroupSegments, normalizedSrtPath);
+        await exportSrt(syncedGroupSegments, finalSrtPath);
+
+        const previousTranslatedJson = await readJson(paths.translatedJson, null) || {};
+        await writeJson(paths.translatedJson, {
+          ...previousTranslatedJson,
+          segments: syncedGroupSegments,
+          rawSegments: syncedGroupSegments,
+          meaningUnits: syncedGroupSegments,
+          ttsUnits: syncedGroupSegments,
+          updatedAfterTtsAt: new Date().toISOString(),
+        });
+
         renderResult = {
           success: true,
           jobId,
@@ -7468,10 +7508,15 @@ app.post('/api/manual/generate-tts', async (req, res) => {
           readabilityQcReportUrl: translationPersistPaths.readabilityQcReportPath ? toPublicJobUrl(jobId, translationPersistPaths.readabilityQcReportPath) : '',
           translationQcReportPath: translationPersistPaths.translationQcReportPath || '',
           translationQcReportUrl: translationPersistPaths.translationQcReportPath ? toPublicJobUrl(jobId, translationPersistPaths.translationQcReportPath) : '',
-          rows: autoTtsRepairReport.changedRows.length ? workingSegments : undefined,
-          segments: autoTtsRepairReport.changedRows.length ? workingSegments : undefined,
-          meaningUnits: autoTtsRepairReport.changedRows.length ? workingRawMeaningUnits : undefined,
-          ttsUnits: autoTtsRepairReport.changedRows.length ? workingRawTtsUnits : undefined,
+          srtPath: finalSrtPath,
+          srtUrl: toPublicJobUrl(jobId, finalSrtPath),
+          srtContent: segmentsToSrt(syncedGroupSegments),
+          normalizedSrtPath,
+          normalizedSrtUrl: toPublicJobUrl(jobId, normalizedSrtPath),
+          rows: syncedGroupSegments,
+          segments: syncedGroupSegments,
+          meaningUnits: syncedGroupSegments,
+          ttsUnits: syncedGroupSegments,
           report: aligned.report,
         };
       }

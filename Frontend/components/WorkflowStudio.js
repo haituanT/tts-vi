@@ -1054,6 +1054,51 @@ function subtitleLineLengthForConfig(config = {}, aspectRatio = 0) {
   return configured;
 }
 
+function formatSubtitleMaxWordsPerLine(text, maxWords = 15) {
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!clean) return [];
+  const words = clean.split(' ').filter(Boolean);
+  if (words.length <= maxWords) {
+    return [clean];
+  }
+
+  const numLines = Math.ceil(words.length / maxWords);
+  const targetWordsPerLine = Math.ceil(words.length / numLines);
+
+  const lines = [];
+  let remainingText = clean;
+
+  while (remainingText) {
+    const remWords = remainingText.split(' ').filter(Boolean);
+    if (remWords.length <= maxWords) {
+      lines.push(remainingText);
+      break;
+    }
+
+    let foundPunctuationIndex = -1;
+    for (let offset = 0; offset <= 3; offset++) {
+      const candidates = [targetWordsPerLine + offset, targetWordsPerLine - offset];
+      for (const idx of candidates) {
+        if (idx > 0 && idx < remWords.length) {
+          const w = remWords[idx - 1];
+          if (/[.,!?;:，。！？；:]/.test(w)) {
+            foundPunctuationIndex = idx;
+            break;
+          }
+        }
+      }
+      if (foundPunctuationIndex !== -1) break;
+    }
+
+    const cutIndex = foundPunctuationIndex !== -1 ? foundPunctuationIndex : targetWordsPerLine;
+    const lineText = remWords.slice(0, cutIndex).join(' ');
+    lines.push(lineText);
+    remainingText = remWords.slice(cutIndex).join(' ');
+  }
+
+  return lines;
+}
+
 function activePreviewSubtitleChunk(row, text, currentTime, maxLineLength) {
   const cleanText = normalizeSubtitleDisplayText(text);
   if (!cleanText) return '';
@@ -3461,12 +3506,13 @@ export default function WorkflowStudio() {
     || rows.find((row) => state.currentTime >= row.start && state.currentTime <= row.end)
     || selectedRow;
   const activeSubtitleText = rowText(activePreviewRow || {}, finalField) || rowText(activePreviewRow || {}, 'sourceText');
-  const previewMaxLineLength = subtitleLineLengthForConfig(config, previewVideoAspectRatio);
-  const previewActiveChunk = activePreviewSubtitleChunk(activePreviewRow || {}, activeSubtitleText || SUBTITLE_SAMPLE_TEXT, state.currentTime, previewMaxLineLength);
-  const previewSubtitleText = config.subtitlePreviewEnabled !== false
-    ? normalizeSubtitleDisplayText(previewActiveChunk)
-    : '';
-  const previewSubtitleLines = previewSubtitleText ? [previewSubtitleText] : [];
+  const cleanActiveText = normalizeSubtitleDisplayText(activeSubtitleText);
+  const previewSubtitleText = config.subtitlePreviewEnabled !== false ? cleanActiveText : '';
+  const previewSubtitleLines = previewSubtitleText
+    ? (cleanActiveText.includes('\n')
+        ? cleanActiveText.split('\n')
+        : formatSubtitleMaxWordsPerLine(cleanActiveText, 15))
+    : [];
   const previewSubtitleLineCount = Math.max(1, previewSubtitleLines.length);
   const previewSubtitleBaseFontSize = Math.max(
     10,
@@ -7877,19 +7923,20 @@ export default function WorkflowStudio() {
                           onPointerUp={stopSubtitleDrag}
                           onPointerCancel={stopSubtitleDrag}
                           onLostPointerCapture={stopSubtitleDrag}
-                          className="absolute cursor-move select-none whitespace-nowrap text-center leading-tight"
+                          className="absolute cursor-move select-none text-center leading-normal"
                           style={{
                             ...subtitleVideoStyle(
                               clamp(Number(config.subtitlePositionX ?? 50) || 50, 3, 97),
                               clamp(Number(config.subtitlePositionY ?? 88) || 88, 5, 95),
-                              { width: 'fit-content', maxWidth: subtitleVideoContentWidth(94), minWidth: 0 }
+                              { width: 'max-content', maxWidth: subtitleVideoContentWidth(92), minWidth: 0 }
                             ),
                             transform: 'translate(-50%, -50%)',
                             boxSizing: 'border-box',
                             display: 'inline-block',
-                            whiteSpace: 'nowrap',
-                            overflowWrap: 'normal',
-                            wordBreak: 'normal',
+                            whiteSpace: 'pre-wrap',
+                            overflowWrap: 'break-word',
+                            wordBreak: 'break-word',
+                            textAlign: 'center',
                             color: config.subtitleTextColor,
                             backgroundColor: 'transparent',
                             border: 'none',
@@ -7903,22 +7950,22 @@ export default function WorkflowStudio() {
                             zIndex: 6,
                           }}
                         >
-                          <span className="pointer-events-none flex flex-col items-center gap-[2px]">
-                            {previewSubtitleLines.map((line, index) => (
-                              <span
-                                key={`${index}-${line}`}
-                                className="inline-block whitespace-nowrap"
-                                style={{
-                                  backgroundColor: config.subtitleBoxEnabled ? hexToRgba(config.subtitleBoxColor, config.subtitleBoxOpacity) : 'transparent',
-                                  borderRadius: `${Math.max(0, Math.min(32, Number(config.subtitleBoxRadius ?? DEFAULT_STATE.config.subtitleBoxRadius) || 0))}px`,
-                                  padding: config.subtitleBoxEnabled ? '2px 7px 3px' : '0',
-                                  boxDecorationBreak: 'clone',
-                                  WebkitBoxDecorationBreak: 'clone',
-                                }}
-                              >
-                                {line}
-                              </span>
-                            ))}
+                          <span
+                            className="pointer-events-none inline-block text-center"
+                            style={{
+                              whiteSpace: 'pre-wrap',
+                              overflowWrap: 'break-word',
+                              wordBreak: 'break-word',
+                              textAlign: 'center',
+                              lineHeight: 1.25,
+                              backgroundColor: config.subtitleBoxEnabled ? hexToRgba(config.subtitleBoxColor, config.subtitleBoxOpacity) : 'transparent',
+                              borderRadius: `${Math.max(0, Math.min(32, Number(config.subtitleBoxRadius ?? DEFAULT_STATE.config.subtitleBoxRadius) || 0))}px`,
+                              padding: config.subtitleBoxEnabled ? '5px 12px 6px' : '0',
+                              boxDecorationBreak: 'clone',
+                              WebkitBoxDecorationBreak: 'clone',
+                            }}
+                          >
+                            {previewSubtitleLines.join('\n')}
                           </span>
                           {[
                             ['nw', '-left-1.5 -top-1.5 cursor-nwse-resize'],

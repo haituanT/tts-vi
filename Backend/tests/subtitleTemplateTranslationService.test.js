@@ -122,3 +122,16 @@ test('template translation rejects corrupt unit replacement artifacts', () => {
     /corrupt unit-replacement artifact/
   );
 });
+
+test('promptGroupItem calculates duration_seconds and max_words_guideline from segment timing', () => {
+  const item = _private.promptGroupItem({
+    group_id: 'template-0001',
+    start: 5.0,
+    end: 8.2,
+    text: 'Some text',
+  });
+
+  assert.equal(item.group_id, 'template-0001');
+  assert.equal(item.duration_seconds, 3.2);
+  assert.equal(item.max_words_guideline, 8); // Math.floor(3.2 * 2.7) = 8
+});

@@ -50,7 +50,7 @@ function buildGroupPrompt(cues, config = {}, repair = null, isFinalBatch = false
 
   return buildSkillTaskPrompt({
     skillName: 'subtitle-cue-grouping',
-    task: 'Group raw STT cues into short subtitle template groups. Return grouping decisions only; the system will join original cue text and map timing.',
+    task: 'Group raw STT cues into continuous natural subtitle narration groups. Prefer grouping 6 to 12+ consecutive short cues into complete, natural narration passages (~8-15 seconds) for smooth, continuous voice dubbing, avoiding fragmented short 1-2 word groups.',
     input: payload,
     sourceLanguage: language,
     targetLanguage: config.targetLanguage || 'vi',

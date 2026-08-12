@@ -471,8 +471,12 @@ async function synthesizeSegmentAudio(segment, config, outputPath, overrides = {
     await fs.writeFile(outputPath, Buffer.from(response.data.audioContent, 'base64'));
     return { outputPath, speakingRate: Number(audioConfig.speakingRate || 1), text };
   } catch (error) {
-    const message = error.response?.data?.error?.message || error.message;
-    throw new Error(`TTS failed: ${message}`);
+    try {
+      return await edgeTtsService.synthesizeSegmentAudio(segment, config, outputPath, { text, speakingRate: requestedSpeakingRate });
+    } catch {
+      const message = error.response?.data?.error?.message || error.message;
+      throw new Error(`TTS failed: ${message}`);
+    }
   }
 }
 

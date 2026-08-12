@@ -45,9 +45,33 @@ function translationContextGroupCount(config = {}) {
   return Math.max(0, Math.min(5, Math.round(requested)));
 }
 
+function getSegmentDurationSeconds(segment = {}) {
+  const start = Number(segment.start ?? segment.startTime);
+  const end = Number(segment.end ?? segment.endTime);
+  if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+    return Number((end - start).toFixed(1));
+  }
+  const dur = Number(segment.duration || segment.availableSlotDuration || segment.nominalDuration);
+  if (Number.isFinite(dur) && dur > 0) {
+    return Number(dur.toFixed(1));
+  }
+  if (Array.isArray(segment.originalCues) && segment.originalCues.length) {
+    const firstStart = Number(segment.originalCues[0]?.start);
+    const lastEnd = Number(segment.originalCues[segment.originalCues.length - 1]?.end);
+    if (Number.isFinite(firstStart) && Number.isFinite(lastEnd) && lastEnd > firstStart) {
+      return Number((lastEnd - firstStart).toFixed(1));
+    }
+  }
+  return null;
+}
+
 function promptGroupItem(segment = {}) {
+  const durationSeconds = getSegmentDurationSeconds(segment);
+  const maxWords = durationSeconds ? Math.max(3, Math.floor(durationSeconds * 2.7)) : undefined;
   return {
     group_id: segment.group_id,
+    duration_seconds: durationSeconds || undefined,
+    max_words_guideline: maxWords || undefined,
     text: segment.text,
   };
 }
@@ -115,7 +139,7 @@ function buildTemplateTranslationPrompt(chunk, config = {}, repair = null, conte
 
   return buildSkillTaskPrompt({
     skillName: 'subtitle-translation-prompt',
-    task: `Translate only items_to_translate into ${targetLanguage} as continuous natural narration. Read context_before, items_to_translate, and context_after as one ordered passage before translating so the first and last translated items do not reset the story at chunk boundaries. Context groups are reference only: use them for pronouns, chronology, cause/effect, established names, tone, and transitions, but never output translations for context_before or context_after. Each translated item remains one subtitle line, but a line may continue naturally into the next item and is not required to be a complete sentence.`,
+    task: `Translate and summarize each item into natural, concise ${targetLanguage} as continuous narration for video dubbing. Read context_before, items_to_translate, and context_after as one ordered passage before translating. Each item includes duration_seconds and max_words_guideline: your Vietnamese output MUST be a concise summary translation for that segment so its spoken duration fits comfortably within duration_seconds without overflowing the video timeline. Preserve key narrative meaning and description, but omit filler words to guarantee TTS dubbing never overflows. Each translated item remains one subtitle line.`,
     input: payload,
     sourceLanguage,
     targetLanguage,
@@ -125,7 +149,7 @@ function buildTemplateTranslationPrompt(chunk, config = {}, repair = null, conte
     outputContract: `Return JSON array only for items_to_translate. Do not include context_before or context_after group IDs.
 Return exactly ${chunk.length} objects: one and only one object for every items_to_translate group, including the final group.
 Each item must be:
-{"group_id":"same id","translation_merged":"translated subtitle line"}`,
+{"group_id":"same id","translation_merged":"translated concise summary subtitle line"}`,
   });
 }
 
@@ -307,7 +331,9 @@ module.exports = {
   _private: {
     buildTemplateTranslationPrompt,
     buildChunkWindows,
+    getSegmentDurationSeconds,
     isVietnameseTarget,
     parseTemplateTranslation,
+    promptGroupItem,
   },
 };
